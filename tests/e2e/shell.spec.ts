@@ -229,15 +229,31 @@ for (const theme of ["dark", "light"] as const) {
 
 test("with real motion, close and minimize animate and then finish", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  // The animation classes last ~150-190ms, so record them with an observer instead of polling.
+  await page.addInitScript(() => {
+    const seen = new Set<string>();
+    (window as unknown as { __anim: Set<string> }).__anim = seen;
+    new MutationObserver(() => {
+      if (document.querySelector(".win.closing")) seen.add("closing");
+      if (document.querySelector(".win.minimizing")) seen.add("minimizing");
+    }).observe(document, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  });
   await page.goto("/");
   await dock(page, "about").click();
   await win(page, "about").getByRole("button", { name: "Cerrar" }).click();
-  await expect(win(page, "about")).toHaveClass(/closing/);
   await expect(win(page, "about")).toHaveCount(0);
   await win(page, "home").getByRole("button", { name: "Minimizar" }).click();
-  await expect(win(page, "home")).toHaveClass(/minimizing/);
   await expect(win(page, "home")).toHaveCount(0);
   await expect(dock(page, "home")).toHaveClass(/minimized/);
+  const seen = await page.evaluate(() => [
+    ...(window as unknown as { __anim: Set<string> }).__anim,
+  ]);
+  expect(seen.sort()).toEqual(["closing", "minimizing"]);
 });
 
 test("a dblclick that bubbles from a traffic-light button does not toggle maximize", async ({

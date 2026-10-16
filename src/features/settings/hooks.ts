@@ -26,3 +26,5 @@ export function useResolvedTheme(): "light" | "dark" {
   );
   return choice === "auto" ? (systemDark ? "dark" : "light") : choice;
 }
+
+export const useLang = () => useSettings((s) => s.lang);

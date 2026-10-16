@@ -46,6 +46,7 @@ test.describe("design system catalog", () => {
 });
 
 test("axe: every accent in both themes has no serious/critical violations", async ({ page }) => {
+  test.setTimeout(120_000); // 16 axe passes in one test
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/design-system");
   const failures: string[] = [];

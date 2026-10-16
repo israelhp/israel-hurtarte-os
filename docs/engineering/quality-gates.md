@@ -15,15 +15,15 @@ Status values: `PASS` · `FAIL` · `NOT_VERIFIED` · `NOT_APPLICABLE` · `NEEDS_
 | CI_BUILD_GATE        | typecheck, lint, unit, build, e2e green in GitHub Actions                                       | CI run                               |
 | RELEASE_GATE         | All above PASS, changelog, rollback notes, owner approval                                       | `/prepare-release`                   |
 
-## Current status (after Phase 3: shell)
+## Current status (after Phase 4: the 9 apps)
 
-| Gate                        | Status                                                  | Note                                                                    |
-| --------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
-| DESIGN_FIDELITY_GATE        | PASS (tokens) / NEEDS_MANUAL_REVIEW (shell, components) | token test vs original bundle; shell compared by eye, no pixel diff yet |
-| FUNCTIONAL_GATE             | PASS (design system, shell)                             | app contents are Phase 4 placeholders                                   |
-| WINDOW_MANAGER_GATE         | PASS (mouse + keyboard) / NOT_VERIFIED (real touch)     | 20 model tests + e2e                                                    |
-| ACCESSIBILITY_GATE          | PASS (axe) / NOT_VERIFIED (manual, screen reader)       | axe: catalog 2 themes × 8 accents; shell 2 themes × desktop/mobile      |
-| I18N_GATE                   | PASS (shell strings)                                    | parity test; full content in Phase 4–5                                  |
-| SECURITY_GATE               | NOT_VERIFIED                                            | `audit:prod` clean; full review in Phase 8                              |
-| SEO_GATE / PERFORMANCE_GATE | NOT_VERIFIED                                            | Phase 8                                                                 |
-| CI_BUILD_GATE               | PASS (local)                                            | Actions not yet run (no remote)                                         |
+| Gate                        | Status                                                                                                                            | Note                                                                                                                                              |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DESIGN_FIDELITY_GATE        | PASS (tokens) / NEEDS_MANUAL_REVIEW (shell, apps)                                                                                 | token test vs original bundle; dark screenshots of the apps reviewed by eye, no pixel diff                                                        |
+| FUNCTIONAL_GATE             | PASS (9 apps)                                                                                                                     | 75 unit tests + 84 e2e (desktop + mobile)                                                                                                         |
+| WINDOW_MANAGER_GATE         | PASS (mouse + keyboard) / NOT_VERIFIED (real touch)                                                                               | 21 model + 6 store tests + e2e                                                                                                                    |
+| ACCESSIBILITY_GATE          | PASS (axe: catalog, shell, settings dialog, all 9 apps, dark + light) / NOT_VERIFIED (screen reader, manual keyboard walkthrough) |                                                                                                                                                   |
+| I18N_GATE                   | PASS (ES default, EN complete; parity + content tests)                                                                            | EN spot-checked in e2e; routes `/es` `/en` and persistence in Phase 5                                                                             |
+| SECURITY_GATE               | NOT_VERIFIED (full audit Phase 8)                                                                                                 | terminal allowlist + hostile-input tests, mailto header-injection tests, safeHref tests; `audit:prod` clean; independent review found no blockers |
+| SEO_GATE / PERFORMANCE_GATE | NOT_VERIFIED                                                                                                                      | Phase 8                                                                                                                                           |
+| CI_BUILD_GATE               | PASS (local)                                                                                                                      | Actions not yet run (no remote)                                                                                                                   |

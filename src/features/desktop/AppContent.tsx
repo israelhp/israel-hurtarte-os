@@ -1,19 +1,30 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import type { ComponentType } from "react";
 import type { AppId } from "@/shared/app-ids";
-import { Note } from "@/shared/components";
-import { useT } from "@/features/settings/hooks";
-import { appName } from "./apps";
 
-/** Phase 3 placeholder. Each app's real content replaces this in Phase 4 (PORT-<APP>-001). */
+// Each app is its own chunk, fetched the first time its window opens.
+const load = <T extends ComponentType>(fn: () => Promise<T>) =>
+  dynamic(fn, { loading: () => null });
+
+const APPS: Record<AppId, ComponentType> = {
+  home: load(() => import("@/features/apps/home/HomeApp").then((m) => m.HomeApp)),
+  about: load(() => import("@/features/apps/about/AboutApp").then((m) => m.AboutApp)),
+  stack: load(() => import("@/features/apps/stack/StackApp").then((m) => m.StackApp)),
+  projects: load(() => import("@/features/projects/ProjectsApp").then((m) => m.ProjectsApp)),
+  experience: load(() =>
+    import("@/features/apps/experience/ExperienceApp").then((m) => m.ExperienceApp),
+  ),
+  education: load(() =>
+    import("@/features/apps/education/EducationApp").then((m) => m.EducationApp),
+  ),
+  certs: load(() => import("@/features/apps/certs/CertsApp").then((m) => m.CertsApp)),
+  terminal: load(() => import("@/features/terminal/TerminalApp").then((m) => m.TerminalApp)),
+  contact: load(() => import("@/features/contact/ContactApp").then((m) => m.ContactApp)),
+};
+
 export function AppContent({ id }: { id: AppId }) {
-  const t = useT();
-  return (
-    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 14 }}>
-      <h2 style={{ margin: 0, fontSize: 20 }}>{appName(t, id)}</h2>
-      <Note>
-        <strong>{t.placeholder_title}.</strong> {t.placeholder_body}
-      </Note>
-    </div>
-  );
+  const App = APPS[id];
+  return <App />;
 }
