@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { AppId } from "@/shared/app-ids";
+import { emit } from "@/lib/events";
 import * as wm from "./model";
 
 type Extra = {
@@ -55,6 +56,7 @@ export const useWm = create<wm.WmState & Extra & Actions>()((set, get) => {
     open: (id) => {
       clearTimer(id);
       set((s) => ({ ...wm.openWindow(s, id, getViewport()), openTick: s.openTick + 1 }));
+      emit(`open:${id}`);
     },
     focus: (id) => set((s) => wm.focusWindow(s, id)),
     close: (id) => {
@@ -65,7 +67,10 @@ export const useWm = create<wm.WmState & Extra & Actions>()((set, get) => {
       set((s) => wm.beginMinimize(s, id));
       finishLater(id, "minimizing", MINIMIZE_MS);
     },
-    toggleMax: (id) => set((s) => wm.toggleMax(s, id)),
+    toggleMax: (id) => {
+      set((s) => wm.toggleMax(s, id));
+      emit(`max:${id}`);
+    },
     move: (id, x, y) => set((s) => wm.moveWindow(s, id, x, y, getViewport())),
     syncViewport: () => set((s) => wm.viewportChanged(s, getViewport())),
     reset: () => {

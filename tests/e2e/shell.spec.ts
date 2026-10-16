@@ -7,6 +7,8 @@ const box = async (p: Page, id: string) => (await win(p, id).boundingBox())!;
 const z = (p: Page, id: string) => win(p, id).evaluate((el) => Number(getComputedStyle(el).zIndex));
 
 test.beforeEach(async ({ page }) => {
+  // The guided tour auto-starts on a first visit; these tests are about the rest of the UI.
+  await page.addInitScript(() => localStorage.setItem("ihos:tour-done", "1"));
   await page.emulateMedia({ reducedMotion: "reduce" });
 });
 
@@ -16,7 +18,7 @@ test("loads in Spanish with the Welcome window and a 9-app Dock, without console
   const errors: string[] = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/");
+  await page.goto("/es");
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expect(page.getByRole("heading", { level: 1, name: "ISRAEL HURTARTE.OS" })).toBeAttached();
   await expect(win(page, "home")).toBeVisible();
@@ -28,7 +30,7 @@ test("loads in Spanish with the Welcome window and a 9-app Dock, without console
 test("Dock opens a window, marks it running/current, and a second click only refocuses", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "projects").click();
   await expect(win(page, "projects")).toBeVisible();
   await expect(dock(page, "projects")).toHaveClass(/running/);
@@ -40,7 +42,7 @@ test("Dock opens a window, marks it running/current, and a second click only ref
 
 test("clicking a window brings it to the front", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "compact windows overlap completely");
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "about").click();
   await dock(page, "stack").click();
   expect(await z(page, "stack")).toBeGreaterThan(await z(page, "about"));
@@ -54,7 +56,7 @@ test("clicking a window brings it to the front", async ({ page }, info) => {
 test("minimize hides the window, Dock shows it minimized, Dock click restores it", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await win(page, "home").getByRole("button", { name: "Minimizar" }).click();
   await expect(win(page, "home")).toHaveCount(0);
   await expect(dock(page, "home")).toHaveClass(/minimized/);
@@ -68,7 +70,7 @@ test("maximize fills the work area and restore returns to the previous size", as
   page,
 }, info) => {
   test.skip(info.project.name === "mobile", "windows are already full-screen on compact screens");
-  await page.goto("/");
+  await page.goto("/es");
   const before = await box(page, "home");
   await win(page, "home").getByRole("button", { name: "Maximizar" }).click();
   await expect(win(page, "home")).toHaveClass(/max/);
@@ -82,7 +84,7 @@ test("maximize fills the work area and restore returns to the previous size", as
 });
 
 test("closing returns focus to the Dock icon", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "about").click();
   await win(page, "about").getByRole("button", { name: "Cerrar" }).focus();
   await win(page, "about").getByRole("button", { name: "Cerrar" }).press("Enter");
@@ -93,7 +95,7 @@ test("closing returns focus to the Dock icon", async ({ page }) => {
 
 test("dragging moves a window and can never push it out of reach", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "windows are full-screen on compact screens");
-  await page.goto("/");
+  await page.goto("/es");
   const vp = page.viewportSize()!;
   const bar = win(page, "home").locator(".titlebar");
   const start = await box(page, "home");
@@ -124,7 +126,7 @@ test("dragging moves a window and can never push it out of reach", async ({ page
 });
 
 test("keyboard: arrows move a window, Enter maximizes, Escape closes", async ({ page }, info) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "about").click();
   const handle = win(page, "about").locator(".wtitle");
   await handle.focus();
@@ -144,7 +146,7 @@ test("keyboard: arrows move a window, Enter maximizes, Escape closes", async ({ 
 });
 
 test("language switch re-labels the shell and the document language", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await page.getByRole("button", { name: "EN", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(win(page, "home")).toHaveAttribute("aria-label", "Welcome");
@@ -154,15 +156,15 @@ test("language switch re-labels the shell and the document language", async ({ p
 });
 
 test("theme toggle and settings popover (accent, Esc, focus return, reset)", async ({ page }) => {
-  await page.goto("/");
-  const os = page.locator(".os");
-  const start = (await os.getAttribute("class"))!.includes("theme-dark") ? "dark" : "light";
+  await page.goto("/es");
+  const root = page.locator("html");
+  const start = (await root.getAttribute("data-theme")) === "dark" ? "dark" : "light";
   await page
     .getByRole("button", {
       name: start === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro",
     })
     .click();
-  await expect(os).toHaveClass(start === "dark" ? /theme-light/ : /theme-dark/);
+  await expect(root).toHaveAttribute("data-theme", start === "dark" ? "light" : "dark");
 
   const trigger = page.getByRole("button", { name: "Configuración" });
   await trigger.click();
@@ -170,7 +172,7 @@ test("theme toggle and settings popover (accent, Esc, focus return, reset)", asy
   await expect(dialog).toBeVisible();
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
   await dialog.getByRole("button", { name: "Morado" }).click();
-  await expect(os).toHaveClass(/acc-purple/);
+  await expect(root).toHaveAttribute("data-accent", "purple");
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();
@@ -185,7 +187,7 @@ test("theme toggle and settings popover (accent, Esc, focus return, reset)", asy
 
 test("window surfaces keep the prototype's backdrop blur on desktop", async ({ page }, info) => {
   test.skip(info.project.name === "mobile", "blur is intentionally dropped at <=760px (D6)");
-  await page.goto("/");
+  await page.goto("/es");
   const blur = await win(page, "home").evaluate((el) => getComputedStyle(el).backdropFilter);
   expect(blur).toContain("blur(40px)");
 });
@@ -194,7 +196,7 @@ test("compact screens: windows are full-width, no horizontal scroll, blur droppe
   page,
 }, info) => {
   test.skip(info.project.name !== "mobile", "mobile viewport only");
-  await page.goto("/");
+  await page.goto("/es");
   const vp = page.viewportSize()!;
   const b = await box(page, "home");
   expect(Math.round(b.width)).toBe(vp.width);
@@ -211,14 +213,14 @@ for (const theme of ["dark", "light"] as const) {
   test(`axe: shell with open windows has no serious/critical violations (${theme})`, async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/es");
     await win(page, "home").getByRole("button", { name: "Minimizar" }).click();
     await dock(page, "projects").click();
     await dock(page, "terminal").click();
-    const os = page.locator(".os");
-    if (!(await os.getAttribute("class"))!.includes(`theme-${theme}`))
+    const root = page.locator("html");
+    if ((await root.getAttribute("data-theme")) !== theme)
       await page.getByRole("button", { name: /Cambiar a tema/ }).click();
-    await expect(os).toHaveClass(new RegExp(`theme-${theme}`));
+    await expect(root).toHaveAttribute("data-theme", theme);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const blocking = violations.filter((v) => v.impact === "serious" || v.impact === "critical");
     expect(
@@ -243,7 +245,7 @@ test("with real motion, close and minimize animate and then finish", async ({ pa
       attributeFilter: ["class"],
     });
   });
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "about").click();
   await win(page, "about").getByRole("button", { name: "Cerrar" }).click();
   await expect(win(page, "about")).toHaveCount(0);
@@ -260,7 +262,7 @@ test("a dblclick that bubbles from a traffic-light button does not toggle maximi
   page,
 }, info) => {
   test.skip(info.project.name === "mobile", "compact windows ignore maximize");
-  await page.goto("/");
+  await page.goto("/es");
   await win(page, "home").getByRole("button", { name: "Minimizar" }).dispatchEvent("dblclick");
   await expect(win(page, "home")).not.toHaveClass(/max/);
   // while a dblclick on the bare title bar still toggles it
@@ -271,7 +273,7 @@ test("a dblclick that bubbles from a traffic-light button does not toggle maximi
 });
 
 test("re-opening an open window from the Dock moves keyboard focus into it", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "home").click();
   await expect(win(page, "home")).toBeFocused();
   await dock(page, "about").click();
@@ -281,7 +283,7 @@ test("re-opening an open window from the Dock moves keyboard focus into it", asy
 });
 
 test("minimize and close return focus to the Dock icon", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "about").click();
   await win(page, "about").getByRole("button", { name: "Minimizar" }).click();
   await expect(dock(page, "about")).toBeFocused();
@@ -291,7 +293,7 @@ test("minimize and close return focus to the Dock icon", async ({ page }) => {
 });
 
 test("after Reset windows, keyboard focus lands in the Welcome window", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/es");
   await dock(page, "stack").click();
   await page.getByRole("button", { name: "Configuración" }).click();
   await page.getByRole("button", { name: "Restablecer ventanas" }).click();
@@ -303,7 +305,7 @@ for (const theme of ["dark", "light"] as const) {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce", colorScheme: theme });
-    await page.goto("/");
+    await page.goto("/es");
     await page.getByRole("button", { name: "Configuración" }).click();
     await expect(page.getByRole("dialog", { name: "Configuración" })).toBeVisible();
     const { violations } = await new AxeBuilder({ page }).analyze();

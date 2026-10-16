@@ -1,0 +1,7 @@
+# Verification — PORT-SETTINGS-001 (2026-10-15)
+
+| Gate               | Status                                   | Evidence                                                                                                                                                                                                                           |
+| ------------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FUNCTIONAL_GATE    | PASS                                     | e2e: reload keeps theme+accent and the dialog shows them; prefs applied with all JS blocked (counted aborted chunks + no window rendered); `auto` follows the system; corrupt storage → defaults; blocked localStorage → no errors |
+| ACCESSIBILITY_GATE | PASS (axe, settings dialog, both themes) | existing shell axe tests                                                                                                                                                                                                           |
+| CI_BUILD_GATE      | PASS (local)                             | unit: parsing/whitelisting/throwing storage (8), boot script incl. the serialized `toString()` form and parity with `persistence.ts` (7)                                                                                           |

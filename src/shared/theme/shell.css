@@ -532,3 +532,21 @@
     margin-top: 1px;
   }
 }
+
+/* Menu-bar Portfolio View button — prototype lines 171-172. */
+.pv-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 0.5px solid var(--sep2);
+  background: var(--btn);
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--label);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+.pv-btn:hover {
+  background: var(--btn-h);
+}

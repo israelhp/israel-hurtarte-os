@@ -1,0 +1,204 @@
+/* Guided tour — prototype CSS lines 453-480 and 483 (tour-icon 481-482 lives in components.css). */
+/* guided tour */
+.tour {
+  position: absolute;
+  inset: 0;
+  z-index: 3000;
+  pointer-events: none;
+}
+.tour-dim,
+.tour-card {
+  pointer-events: auto;
+}
+.tour-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.52);
+  transition: clip-path 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+[data-theme="light"] .tour-dim {
+  background: rgba(15, 23, 42, 0.42);
+}
+.tour-dim.full {
+  clip-path: none !important;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.tour-ring {
+  position: absolute;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 2px var(--acc),
+    0 0 0 6px var(--acc-soft);
+  pointer-events: none;
+  transition:
+    left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.35s,
+    height 0.35s;
+  animation: ringPulse 1.8s ease-in-out infinite;
+}
+@keyframes ringPulse {
+  50% {
+    box-shadow:
+      0 0 0 2px var(--acc),
+      0 0 0 12px transparent;
+  }
+}
+.tour-card {
+  position: absolute;
+  z-index: 2;
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--pop);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 0.5px solid var(--win-bd);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--label);
+  transition:
+    left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: tourIn 0.25s ease;
+}
+@keyframes tourIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.tour-card.above {
+  transform: translateY(-100%);
+}
+.tour-card.center {
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 32px)) !important;
+  text-align: center;
+  align-items: center;
+  padding: 30px 26px 24px;
+}
+.tour-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.tour-step {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--label2);
+}
+.tour-skip {
+  background: none;
+  border: 0;
+  color: var(--label2);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.tour-skip:hover {
+  background: var(--fill2);
+  color: var(--label);
+}
+.tour-card h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.tour-card p {
+  margin: 0;
+  color: var(--label2);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.tour-hint {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--acc-soft);
+  color: var(--label);
+  font-size: 12.5px;
+  text-align: left;
+  width: 100%;
+}
+.tour-hint i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc);
+  flex: none;
+  animation: hintPulse 1.3s ease-out infinite;
+}
+@keyframes hintPulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+}
+.tour-dots {
+  display: flex;
+  gap: 5px;
+}
+.tour-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--fill);
+  transition:
+    width 0.2s,
+    background 0.2s;
+}
+.tour-dots span.on {
+  width: 18px;
+  background: var(--acc);
+}
+.tour-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.tour-btns {
+  display: flex;
+  gap: 8px;
+}
+.center .tour-foot {
+  flex-direction: column;
+  gap: 14px;
+}
+.center .tour-btns {
+  justify-content: center;
+}
+.tour-keys {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* The tour is mounted once in the layout, outside the page's `.os` root, so it carries its own `.os`
+   to receive the theme variables (--pop, --label, --acc…). It is a transparent, click-through viewport layer. */
+.os.tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  width: auto;
+  height: auto;
+  background: none;
+  pointer-events: none;
+  overflow: visible;
+}

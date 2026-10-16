@@ -9,7 +9,7 @@
   --acc-soft: color-mix(in srgb, var(--acc) 16%, transparent);
   transition: background 0.3s;
 }
-.os.theme-dark {
+[data-theme="dark"] .os {
   color-scheme: dark;
   --blue: #0a84ff;
   --purple: #bf5af2;
@@ -66,7 +66,7 @@
     linear-gradient(165deg, #0c1424, #05070c);
 }
 /* Aqua (Light) */
-.os.theme-light {
+[data-theme="light"] .os {
   color-scheme: light;
   --blue: #007aff;
   --purple: #af52de;
@@ -123,32 +123,32 @@
     linear-gradient(165deg, #e4e9ef, #c9d2dc);
 }
 /* macOS accent colors */
-.os.acc-blue {
+[data-accent="blue"] .os {
   --acc: var(--blue);
 }
-.os.acc-purple {
+[data-accent="purple"] .os {
   --acc: var(--purple);
 }
-.os.acc-pink {
+[data-accent="pink"] .os {
   --acc: var(--pink);
 }
-.os.acc-red {
+[data-accent="red"] .os {
   --acc: var(--red);
 }
-.os.acc-orange {
+[data-accent="orange"] .os {
   --acc: var(--orange);
 }
-.os.acc-yellow {
+[data-accent="yellow"] .os {
   --acc: var(--yellow);
   --acc-on: #000;
 }
-.os.acc-green {
+[data-accent="green"] .os {
   --acc: var(--green);
 }
-.os.acc-graphite {
+[data-accent="graphite"] .os {
   --acc: var(--gray);
 }
-.os.theme-light.acc-yellow .btn.primary,
-.os.theme-light.acc-yellow .fbtn.on {
+[data-theme="light"][data-accent="yellow"] .os .btn.primary,
+[data-theme="light"][data-accent="yellow"] .os .fbtn.on {
   color: #000;
 }

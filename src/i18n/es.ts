@@ -132,6 +132,26 @@ export const es = {
     "Comandos disponibles:\n  help            muestra esta lista\n  about           abre Sobre mí\n  skills          abre el Explorador de tecnologías\n  projects        abre el Explorador de proyectos\n  experience      abre la Línea de carrera\n  education       abre Educación\n  certifications  abre la Bóveda de certificaciones\n  contact         abre el Centro de contacto\n  whoami          ¿quién es este desarrollador?\n  clear           limpia la pantalla\nTip: Tab para autocompletar, ↑/↓ para el historial.",
   term_whoami: "Full Stack Developer — Guatemala",
   chips_label: "Comandos sugeridos",
+  nav_portfolio: "Vista portafolio",
+  desktop_mode: "Modo escritorio",
+  get_in_touch: "Cont\u00e1ctame",
+  footer: "Prototipo de portafolio interactivo",
+  tour_btn: "Tutorial guiado",
+  tour_skip: "Saltar tutorial",
+  tour_try: "Pru\u00e9balo:",
+  tour_later: "Quiz\u00e1s luego",
+  tour_start: "Comenzar tutorial",
+  tour_back: "Atr\u00e1s",
+  tour_next: "Siguiente",
+  tour_finish: "Empezar a explorar",
+  tour_step: "PASO",
+  meta_title: "ISRAEL HURTARTE.OS \u2014 Israel Hurtarte, Desarrollador Full Stack",
+  meta_desc:
+    "Portafolio interactivo de Israel Hurtarte, Desarrollador Full Stack en Guatemala. Explora proyectos, tecnolog\u00edas y experiencia como en un sistema operativo de escritorio.",
+  meta_title_portfolio: "Portafolio \u2014 Israel Hurtarte | ISRAEL HURTARTE.OS",
+  meta_desc_portfolio:
+    "Vista de portafolio de Israel Hurtarte, Desarrollador Full Stack en Guatemala: perfil, tecnolog\u00edas, proyectos, experiencia, educaci\u00f3n y contacto.",
+  portfolio_nav: "Secciones del portafolio",
 } as const;
 
 export type Dictionary = { [K in keyof typeof es]: string };

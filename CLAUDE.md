@@ -11,12 +11,12 @@ Interactive desktop-OS style portfolio (macOS look) for Israel Hurtarte, Full St
 ## Stack and commands
 
 Next.js 16 (App Router, static export) · React 19 · TypeScript strict · Tailwind 4 · Zustand · Vitest · Playwright · Vercel.
-`npm run check` (typecheck + lint + unit + build) · `npm run test:e2e` (needs a prior `npm run build`) · `npm run format` · `npm run audit:prod`.
+`npm run check` (typecheck + lint + unit + build) · `npm run test:e2e` (needs a prior clean `npm run build`) · `npm run format` · `npm run audit:prod`.
 Next.js here may differ from training data; read `node_modules/next/dist/docs/` before using unfamiliar APIs.
 
 ## Non-negotiables
 
-- Official name `ISRAEL HURTARTE.OS`; `DEV.OS` is never a brand. Default language Spanish (`/es`), English complete (`/en`).
+- Official name `ISRAEL HURTARTE.OS`; `DEV.OS` is never a brand. Default language Spanish (`/es`), English complete (`/en`); the language comes from the URL. Portfolio View is `/es/portfolio` and `/en/portfolio`.
 - Terminal = allowlisted simulation, no eval/exec. Contact = `mailto:`; never fake a successful send.
 - No backend/DB/microservices without a real requirement. No new dependency without justification.
 - Work in phases (docs/phase-0-audit.md §10). **Stop at the end of each phase and ask for authorization.** Commit/push/deploy only when the owner asks; production deploys need explicit approval.

@@ -1,28 +1,26 @@
 import { create } from "zustand";
 import type { Accent } from "@/shared/theme/options";
-import { DEFAULT_LANG, type Lang } from "@/i18n";
+import type { ThemeChoice } from "./persistence";
 
-export type ThemeChoice = "light" | "dark" | "auto";
+export type { ThemeChoice };
 
 type SettingsState = {
-  lang: Lang;
   theme: ThemeChoice;
   accent: Accent;
   settingsOpen: boolean;
-  setLang: (l: Lang) => void;
+  /** True once stored preferences were read on the client (persisting before that would overwrite them). */
+  hydrated: boolean;
   setTheme: (t: ThemeChoice) => void;
   setAccent: (a: Accent) => void;
   setSettingsOpen: (open: boolean) => void;
 };
 
-// Defaults follow the prototype (theme auto, blue accent) with Spanish as default language.
-// Persistence across visits is added in Phase 5.
+// Defaults follow the prototype (theme auto, blue accent). The language is not here: it comes from the route.
 export const useSettings = create<SettingsState>()((set) => ({
-  lang: DEFAULT_LANG,
   theme: "auto",
   accent: "blue",
   settingsOpen: false,
-  setLang: (lang) => set({ lang }),
+  hydrated: false,
   setTheme: (theme) => set({ theme }),
   setAccent: (accent) => set({ accent }),
   setSettingsOpen: (settingsOpen) => set({ settingsOpen }),

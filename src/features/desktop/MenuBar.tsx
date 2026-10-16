@@ -1,28 +1,36 @@
 "use client";
 
+import Link from "next/link";
+import { useEffect } from "react";
 import { Icon } from "@/shared/icons/Icon";
-import { Segmented } from "@/shared/components";
-import { LANGS } from "@/i18n";
+import { emit } from "@/lib/events";
 import { SITE } from "@/lib/site";
-import { useResolvedTheme, useT } from "@/features/settings/hooks";
+import { profile } from "@/content/profile";
+import { useLang, useT } from "@/features/settings/hooks";
+import { LangSwitch } from "@/features/settings/LangSwitch";
+import { ThemeToggle } from "@/features/settings/ThemeToggle";
+import { takeLangRefocus } from "@/features/settings/useSwitchLang";
 import { useSettings } from "@/features/settings/store";
+import { useTour } from "@/features/tour/store";
 import { useWm } from "@/features/window-manager/store";
 import { appName } from "./apps";
 import { useClock } from "./useClock";
 
 const NAV = ["projects", "stack", "terminal", "contact"] as const;
-const ROLE: Record<string, string> = { es: "Desarrollador Full Stack", en: SITE.role };
 
 export function MenuBar() {
   const t = useT();
-  const lang = useSettings((s) => s.lang);
-  const setLang = useSettings((s) => s.setLang);
-  const setTheme = useSettings((s) => s.setTheme);
+  const lang = useLang();
   const settingsOpen = useSettings((s) => s.settingsOpen);
   const setSettingsOpen = useSettings((s) => s.setSettingsOpen);
   const open = useWm((s) => s.open);
-  const dark = useResolvedTheme() === "dark";
   const clock = useClock(lang);
+
+  // After a language switch the page re-renders under the new route: give focus back to the language control.
+  useEffect(() => {
+    if (takeLangRefocus())
+      document.querySelector<HTMLElement>('.topbar .seg button[aria-pressed="true"]')?.focus();
+  }, []);
 
   return (
     <header className="topbar">
@@ -33,7 +41,7 @@ export function MenuBar() {
         <span className="sr-only"> — {appName(t, "home")}</span>
       </button>
       <span className="tb-sep" />
-      <span className="tb-role">{ROLE[lang]}</span>
+      <span className="tb-role">{profile.role[lang]}</span>
       <nav className="tb-nav" aria-label={t.main_nav}>
         {NAV.map((id) => (
           <button key={id} type="button" className="tb-link" onClick={() => open(id)}>
@@ -45,32 +53,40 @@ export function MenuBar() {
       <span className="tb-clock" suppressHydrationWarning>
         {clock}
       </span>
-      <Segmented
-        label={t.language}
-        value={lang}
-        onChange={setLang}
-        options={LANGS.map((l) => ({ value: l, label: l.toUpperCase() }))}
-      />
-      <button
-        type="button"
-        className="icon-btn"
-        aria-label={dark ? t.to_light : t.to_dark}
-        title={dark ? t.to_light : t.to_dark}
-        onClick={() => setTheme(dark ? "light" : "dark")}
+      <Link
+        href={`/${lang}/portfolio`}
+        className="pv-btn"
+        aria-label={t.nav_portfolio}
+        data-tour="pv"
+        onClick={() => emit("portfolio")}
       >
-        <Icon name={dark ? "sun" : "moon"} />
-      </button>
-      <button
-        type="button"
-        id="settings-trigger"
-        className="icon-btn"
-        aria-label={t.settings}
-        aria-haspopup="dialog"
-        aria-expanded={settingsOpen}
-        onClick={() => setSettingsOpen(!settingsOpen)}
-      >
-        <Icon name="sliders" />
-      </button>
+        <Icon name="layout" />
+        <span>{t.nav_portfolio}</span>
+      </Link>
+      <div data-tour="prefs" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <LangSwitch />
+        <ThemeToggle />
+        <button
+          type="button"
+          id="settings-trigger"
+          className="icon-btn"
+          aria-label={t.settings}
+          aria-haspopup="dialog"
+          aria-expanded={settingsOpen}
+          onClick={() => setSettingsOpen(!settingsOpen)}
+        >
+          <Icon name="sliders" />
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          aria-label={t.tour_btn}
+          title={t.tour_btn}
+          onClick={() => useTour.getState().start()}
+        >
+          <Icon name="help" />
+        </button>
+      </div>
     </header>
   );
 }

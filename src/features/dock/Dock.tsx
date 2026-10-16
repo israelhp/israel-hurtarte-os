@@ -17,6 +17,7 @@ function DockItem({ id }: { id: AppId }) {
     <button
       type="button"
       data-dock-app={id}
+      data-tour={id === "terminal" ? "dock-terminal" : undefined}
       className={cn("dock-item", w.open && "running", w.open && w.min && "minimized")}
       aria-current={active ? "true" : undefined}
       onClick={() => open(id)}

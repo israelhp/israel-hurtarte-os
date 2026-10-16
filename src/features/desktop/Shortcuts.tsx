@@ -1,13 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { AppTile } from "@/shared/components";
-import { useT } from "@/features/settings/hooks";
+import { emit } from "@/lib/events";
+import { useLang, useT } from "@/features/settings/hooks";
 import { useWm } from "@/features/window-manager/store";
 import { appName } from "./apps";
 
 /** Desktop icons (hidden below 1100px by the prototype's responsive rules). */
 export function Shortcuts() {
   const t = useT();
+  const lang = useLang();
   const open = useWm((s) => s.open);
   return (
     <nav className="shortcuts" aria-label={t.desktop_shortcuts}>
@@ -23,6 +26,10 @@ export function Shortcuts() {
         <AppTile app="terminal" size="shortcut" />
         {appName(t, "terminal")}
       </button>
+      <Link href={`/${lang}/portfolio`} className="sc" onClick={() => emit("portfolio")}>
+        <AppTile app="stack" size="shortcut" icon="layout" />
+        {t.nav_portfolio}
+      </Link>
     </nav>
   );
 }

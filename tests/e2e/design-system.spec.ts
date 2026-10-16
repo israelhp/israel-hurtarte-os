@@ -10,22 +10,23 @@ test.describe("design system catalog", () => {
 
   test("is not indexable and starts dark/blue", async ({ page }) => {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-    await expect(page.locator(".os")).toHaveClass(/theme-dark/);
-    await expect(page.locator(".os")).toHaveClass(/acc-blue/);
+    await expect(page.locator("[data-theme]")).toHaveAttribute("data-theme", "dark");
+    await expect(page.locator("[data-theme]")).toHaveAttribute("data-accent", "blue");
   });
 
   test("theme and accent controls change the root classes and computed tokens", async ({
     page,
   }) => {
     const os = page.locator(".os");
+    const holder = page.locator("[data-theme]");
     const label = () =>
       os.evaluate((el) => getComputedStyle(el).getPropertyValue("--label").trim());
     const dark = await label();
     await page.getByRole("button", { name: "light", exact: true }).click();
-    await expect(os).toHaveClass(/theme-light/);
+    await expect(holder).toHaveAttribute("data-theme", "light");
     expect(await label()).not.toBe(dark);
     await page.getByRole("button", { name: "purple" }).click();
-    await expect(os).toHaveClass(/acc-purple/);
+    await expect(holder).toHaveAttribute("data-accent", "purple");
     const vars = await os.evaluate((el) => {
       const cs = getComputedStyle(el);
       return [cs.getPropertyValue("--acc").trim(), cs.getPropertyValue("--purple").trim()];

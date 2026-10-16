@@ -5,16 +5,18 @@ import { Icon } from "@/shared/icons/Icon";
 import { AccentPicker, Segmented } from "@/shared/components";
 import { ACCENTS, type Accent } from "@/shared/theme/options";
 import { LANGS } from "@/i18n";
-import { useT } from "@/features/settings/hooks";
-import { useSettings, type ThemeChoice } from "@/features/settings/store";
+import { useLang, useT } from "@/features/settings/hooks";
+import { useSwitchLang } from "@/features/settings/useSwitchLang";
+import { THEME_CHOICES } from "@/features/settings/persistence";
+import { useSettings } from "@/features/settings/store";
+import { useTour } from "@/features/tour/store";
 import { useWm } from "@/features/window-manager/store";
-
-const THEME_CHOICES: ThemeChoice[] = ["light", "dark", "auto"];
 
 export function SettingsPopover() {
   const t = useT();
-  const { lang, theme, accent, settingsOpen, setLang, setTheme, setAccent, setSettingsOpen } =
-    useSettings();
+  const { theme, accent, settingsOpen, setTheme, setAccent, setSettingsOpen } = useSettings();
+  const lang = useLang();
+  const setLang = useSwitchLang();
   const ref = useRef<HTMLDivElement>(null);
 
   const close = () => {
@@ -74,6 +76,17 @@ export function SettingsPopover() {
             options={LANGS.map((l) => ({ value: l, label: l.toUpperCase() }))}
           />
         </div>
+        <button
+          type="button"
+          className="pop-btn"
+          onClick={() => {
+            close();
+            useTour.getState().start();
+          }}
+        >
+          <Icon name="help" />
+          {t.tour_btn}
+        </button>
         <button
           type="button"
           className="pop-btn"

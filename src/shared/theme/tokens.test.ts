@@ -20,7 +20,7 @@ function prototypeTemplate(): string {
 }
 
 function vars(css: string, selector: string): Record<string, string> {
-  const re = new RegExp(selector.replace(/\./g, "\\.") + "\\s*\\{");
+  const re = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{");
   const m = re.exec(css);
   if (!m) throw new Error(`selector not found: ${selector}`);
   const from = m.index + m[0].length;
@@ -46,10 +46,9 @@ describe("design tokens match the Claude Design prototype", () => {
   const proto = prototypeTemplate();
 
   for (const theme of ["dark", "light"] as const) {
-    it(`.os.theme-${theme} defines exactly the prototype's custom properties`, () => {
-      const sel = `.os.theme-${theme}`;
-      const expected = vars(proto, sel);
-      const actual = vars(tokensCss, sel);
+    it(`[data-theme="${theme}"] .os defines exactly the prototype's .os.theme-${theme} custom properties`, () => {
+      const expected = vars(proto, `.os.theme-${theme}`);
+      const actual = vars(tokensCss, `[data-theme="${theme}"] .os`);
       expect(Object.keys(expected).length).toBeGreaterThan(40);
       expect(Object.keys(actual).sort()).toEqual(Object.keys(expected).sort());
       for (const [k, v] of Object.entries(expected)) {
@@ -59,15 +58,15 @@ describe("design tokens match the Claude Design prototype", () => {
   }
 
   it("dark and light themes expose the same variable names", () => {
-    expect(Object.keys(vars(tokensCss, ".os.theme-dark")).sort()).toEqual(
-      Object.keys(vars(tokensCss, ".os.theme-light")).sort(),
+    expect(Object.keys(vars(tokensCss, '[data-theme="dark"] .os')).sort()).toEqual(
+      Object.keys(vars(tokensCss, '[data-theme="light"] .os')).sort(),
     );
   });
 
   it("defines every accent from the prototype", () => {
     for (const a of ACCENTS) {
       expect(compact(tokensCss), a).toContain(
-        compact(`.os.acc-${a}{--acc:var(--${a === "graphite" ? "gray" : a})`),
+        compact(`[data-accent="${a}"] .os{--acc:var(--${a === "graphite" ? "gray" : a})`),
       );
       expect(compact(proto), a).toContain(
         compact(`.os.acc-${a}{--acc:var(--${a === "graphite" ? "gray" : a})`),

@@ -381,7 +381,7 @@
   white-space: pre-wrap;
   line-height: 1.6;
 }
-.os.theme-dark .arch {
+[data-theme="dark"] .os .arch {
   color: #a5a3ff;
 }
 /* experience */

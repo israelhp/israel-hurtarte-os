@@ -2,11 +2,14 @@
 
 import { useSyncExternalStore } from "react";
 import { DICTIONARIES, type Dictionary } from "@/i18n";
+import { useLang } from "./LangProvider";
 import { useSettings } from "./store";
 
-/** Translation dictionary for the active language. */
+export { useLang };
+
+/** Translation dictionary for the language in the URL. */
 export function useT(): Dictionary {
-  return DICTIONARIES[useSettings((s) => s.lang)];
+  return DICTIONARIES[useLang()];
 }
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
@@ -16,7 +19,7 @@ const subscribeScheme = (cb: () => void) => {
   return () => mq.removeEventListener("change", cb);
 };
 
-/** Resolved light/dark theme. The server and first client render use dark, like the prototype. */
+/** Resolved light/dark theme. The server and the hydration pass use dark, like the prototype. */
 export function useResolvedTheme(): "light" | "dark" {
   const choice = useSettings((s) => s.theme);
   const systemDark = useSyncExternalStore(
@@ -26,5 +29,3 @@ export function useResolvedTheme(): "light" | "dark" {
   );
   return choice === "auto" ? (systemDark ? "dark" : "light") : choice;
 }
-
-export const useLang = () => useSettings((s) => s.lang);

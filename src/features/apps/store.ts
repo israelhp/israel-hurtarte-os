@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { CategoryId, CertCategory, ProjectFolder } from "@/content/types";
+import { emit } from "@/lib/events";
 import { useWm } from "@/features/window-manager/store";
 
 export type ProjectFilter = "all" | ProjectFolder;
@@ -36,7 +37,10 @@ export const useApps = create<AppsState>()((set) => ({
   setStackQuery: (stackQuery) => set({ stackQuery }),
   setStackSel: (stackSel) => set({ stackSel }),
   setProjectFilter: (projectFilter) => set({ projectFilter, projectSel: null }),
-  setProjectSel: (projectSel) => set({ projectSel }),
+  setProjectSel: (projectSel) => {
+    set({ projectSel });
+    if (projectSel) emit("detail");
+  },
   openProject: (id) => {
     set({ projectSel: id });
     useWm.getState().open("projects");

@@ -22,6 +22,9 @@
 - T8 Prototype CSS lists `backdrop-filter` before `-webkit-backdrop-filter`; the production CSS minifier then kept only the prefixed one (no blur in Chromium). Source order is now prefixed first. Guarded by an e2e that asserts the computed `backdrop-filter` of a window.
 - T9 Shell i18n is a typed dictionary (`Dictionary` = keys of `es`, `en` must match) plus a Zustand `lang`; `/es` `/en` routes and persistence arrive in Phase 5.
 
+- T10 `npm run typecheck` runs `next typegen` first: route helper types (`PageProps`, `LayoutProps`) are generated, so a clean checkout (CI) would otherwise fail `tsc`. Found by checking from a deleted `.next`.
+- T11 Language comes from the URL (React context), preferences from storage; theme/accent are `html` attributes set by an inline boot script (details in docs/specs/PHASE-5-NOTES.md).
+
 ## Accepted risks
 
 - R1 `npm audit` reports 5 high advisories (braces → micromatch → fast-glob → @next/eslint-plugin-next → eslint-config-next) in **dev-only lint tooling**, not shipped. `npm run audit:prod` (production deps) is the release gate. The suggested fix downgrades eslint-config-next to 14: rejected. Revisit when upstream updates.

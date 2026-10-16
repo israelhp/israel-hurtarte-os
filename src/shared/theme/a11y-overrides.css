@@ -10,13 +10,13 @@
   --acc-fill: color-mix(in srgb, var(--acc) 85%, #000);
   --link: color-mix(in srgb, var(--acc) var(--ink-p), var(--ink-b));
 }
-.os.acc-orange,
-.os.acc-green,
-.os.acc-graphite {
+[data-accent="orange"] .os,
+[data-accent="green"] .os,
+[data-accent="graphite"] .os {
   --acc-on: #000;
   --acc-fill: var(--acc);
 }
-.os.acc-yellow {
+[data-accent="yellow"] .os {
   --acc-fill: var(--acc);
 }
 .btn.primary,
@@ -37,6 +37,8 @@
   .dock,
   .win,
   .pop,
+  .tour-card,
+  .tour-dim.full,
   .dock-tile,
   .sc-ico,
   .dock-tip {
@@ -46,7 +48,8 @@
   .topbar,
   .dock,
   .win,
-  .pop {
+  .pop,
+  .tour-card {
     background: var(--sheet);
   }
 }
@@ -58,4 +61,23 @@
     left: 0 !important;
     width: 100% !important;
   }
+}
+
+/* Heading levels (deviation 3): card titles are h3/h2 so the outline has no skipped levels; the prototype's
+   `.sect h4` / `.pd h4` look is applied to those levels too. */
+.sect > h2,
+.sect > h3 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--label2);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Portfolio View on narrow screens (prototype bugs): its two-column grids only collapse inside a container
+   query, but this view had no container; and the hero glow (`inset:-40px -200px`) forced horizontal scroll. */
+.pf {
+  container-type: inline-size;
+  overflow-x: hidden;
 }

@@ -9,8 +9,10 @@ const openApp = async (p: Page, id: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
+  // The guided tour auto-starts on a first visit; these tests are about the rest of the UI.
+  await page.addInitScript(() => localStorage.setItem("ihos:tour-done", "1"));
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/es");
 });
 
 test.describe("Home", () => {
@@ -247,9 +249,13 @@ test.describe("Contact (mailto, honest)", () => {
         else original.call(this);
       };
     });
-    await page.goto("/");
+    await page.goto("/es");
     const requests: string[] = [];
-    page.on("request", (r) => r.method() !== "GET" && requests.push(`${r.method()} ${r.url()}`));
+    // Next may HEAD-prefetch linked pages; anything that could carry data (POST/PUT/…) must never happen.
+    page.on(
+      "request",
+      (r) => !["GET", "HEAD"].includes(r.method()) && requests.push(`${r.method()} ${r.url()}`),
+    );
     const w = await openApp(page, "contact");
     await w.getByLabel("Nombre").fill("Ana Prueba");
     await w.getByLabel("Correo", { exact: true }).fill("ana@example.com");
@@ -292,7 +298,7 @@ for (const theme of ["dark", "light"] as const) {
     );
     test.setTimeout(120_000); // 9 windows, one axe pass each
     await page.emulateMedia({ reducedMotion: "reduce", colorScheme: theme });
-    await page.goto("/");
+    await page.goto("/es");
     const failures: string[] = [];
     for (const id of [
       "home",
@@ -341,7 +347,7 @@ test("compact screens: app windows fit without horizontal scroll", async ({ page
 
 test("terminal welcome line is typed with real motion and ends up in the log", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/es");
   const w = await openApp(page, "terminal");
   const log = w.getByRole("log", { name: "Salida de la terminal" });
   // while typing, the partial text lives outside the live region
@@ -352,7 +358,7 @@ test("terminal welcome line is typed with real motion and ends up in the log", a
 
 test("closing the terminal mid-typing keeps the full welcome line", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/");
+  await page.goto("/es");
   const w = await openApp(page, "terminal");
   await expect(w.locator(".tline[aria-hidden='true']")).toBeVisible();
   await w.getByRole("button", { name: "Cerrar" }).click();
