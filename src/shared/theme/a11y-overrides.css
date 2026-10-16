@@ -23,3 +23,39 @@
 .fbtn.on {
   background: var(--acc-fill);
 }
+
+/* Shell deviations (Phase 3) -------------------------------------------------------------
+   4. A minimized window is shown as a hollow dot in the Dock (prototype only had "running").
+   5. Decision D6: at <=760px stacked backdrop-filter is dropped and surfaces become solid
+      (cost on low-end phones). Desktop keeps the prototype's blur. */
+.dock-item.minimized .dock-dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--label);
+}
+@media (max-width: 760px) {
+  .topbar,
+  .dock,
+  .win,
+  .pop,
+  .dock-tile,
+  .sc-ico,
+  .dock-tip {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .topbar,
+  .dock,
+  .win,
+  .pop {
+    background: var(--sheet);
+  }
+}
+
+/* Compact screens: maximizing is a no-op, so the prototype's 8px margin must not make a
+   "maximized" window look different from the full-screen compact one. */
+@media (max-width: 760px) {
+  .win.max {
+    left: 0 !important;
+    width: 100% !important;
+  }
+}

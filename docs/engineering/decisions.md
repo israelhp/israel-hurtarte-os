@@ -18,6 +18,10 @@
 - T5 Prototype CSS is ported as plain CSS (tokens/base/components) with class names preserved, not re-expressed as Tailwind utilities, to keep fidelity verifiable line by line. Tailwind is used for new layout. Accessibility deviations are isolated in `a11y-overrides.css` (see docs/specs/DS-001/design-reference.md).
 - T6 `/design-system` catalog ships in the static export with `noindex`; revisit excluding it from production builds in Phase 8.
 
+- T7 Window drag uses pointer capture on the title bar, a rAF-throttled `transform`, and one store commit on release. Only the dragged window re-renders; the pure model clamps every move.
+- T8 Prototype CSS lists `backdrop-filter` before `-webkit-backdrop-filter`; the production CSS minifier then kept only the prefixed one (no blur in Chromium). Source order is now prefixed first. Guarded by an e2e that asserts the computed `backdrop-filter` of a window.
+- T9 Shell i18n is a typed dictionary (`Dictionary` = keys of `es`, `en` must match) plus a Zustand `lang`; `/es` `/en` routes and persistence arrive in Phase 5.
+
 ## Accepted risks
 
 - R1 `npm audit` reports 5 high advisories (braces → micromatch → fast-glob → @next/eslint-plugin-next → eslint-config-next) in **dev-only lint tooling**, not shipped. `npm run audit:prod` (production deps) is the release gate. The suggested fix downgrades eslint-config-next to 14: rejected. Revisit when upstream updates.

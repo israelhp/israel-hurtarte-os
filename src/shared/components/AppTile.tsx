@@ -1,16 +1,8 @@
 import { Icon, type IconName } from "../icons/Icon";
 import { cn } from "@/lib/cn";
+import type { AppId } from "../app-ids";
 
-export type AppId =
-  | "home"
-  | "about"
-  | "stack"
-  | "projects"
-  | "experience"
-  | "education"
-  | "certs"
-  | "contact"
-  | "terminal";
+export type { AppId };
 
 /** Prototype per-app tile accent (`.t-*`). */
 export const APP_ICON: Record<AppId, IconName> = {

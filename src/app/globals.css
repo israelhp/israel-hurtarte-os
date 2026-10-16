@@ -2,6 +2,7 @@
 @import "../shared/theme/tokens.css";
 @import "../shared/theme/base.css";
 @import "../shared/theme/components.css";
+@import "../shared/theme/shell.css";
 @import "../shared/theme/a11y-overrides.css";
 
 @theme inline {

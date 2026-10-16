@@ -15,12 +15,15 @@ Status values: `PASS` · `FAIL` · `NOT_VERIFIED` · `NOT_APPLICABLE` · `NEEDS_
 | CI_BUILD_GATE        | typecheck, lint, unit, build, e2e green in GitHub Actions                                       | CI run                               |
 | RELEASE_GATE         | All above PASS, changelog, rollback notes, owner approval                                       | `/prepare-release`                   |
 
-## Current status (after Phase 2, DS-001)
+## Current status (after Phase 3: shell)
 
-| Gate                 | Status                                            | Note                                                                |
-| -------------------- | ------------------------------------------------- | ------------------------------------------------------------------- |
-| DESIGN_FIDELITY_GATE | PASS (tokens) / NEEDS_MANUAL_REVIEW (components)  | token test vs original bundle; side-by-side with windows in Phase 3 |
-| FUNCTIONAL_GATE      | PASS (design system)                              | unit + e2e                                                          |
-| ACCESSIBILITY_GATE   | PASS (automated, catalog) / NOT_VERIFIED (manual) | axe 0 serious/critical, 2 themes × 8 accents                        |
-| CI_BUILD_GATE        | PASS (local)                                      | Actions not yet run                                                 |
-| Others               | NOT_VERIFIED / NOT_APPLICABLE                     | see each spec's verification.md                                     |
+| Gate                        | Status                                                  | Note                                                                    |
+| --------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| DESIGN_FIDELITY_GATE        | PASS (tokens) / NEEDS_MANUAL_REVIEW (shell, components) | token test vs original bundle; shell compared by eye, no pixel diff yet |
+| FUNCTIONAL_GATE             | PASS (design system, shell)                             | app contents are Phase 4 placeholders                                   |
+| WINDOW_MANAGER_GATE         | PASS (mouse + keyboard) / NOT_VERIFIED (real touch)     | 20 model tests + e2e                                                    |
+| ACCESSIBILITY_GATE          | PASS (axe) / NOT_VERIFIED (manual, screen reader)       | axe: catalog 2 themes × 8 accents; shell 2 themes × desktop/mobile      |
+| I18N_GATE                   | PASS (shell strings)                                    | parity test; full content in Phase 4–5                                  |
+| SECURITY_GATE               | NOT_VERIFIED                                            | `audit:prod` clean; full review in Phase 8                              |
+| SEO_GATE / PERFORMANCE_GATE | NOT_VERIFIED                                            | Phase 8                                                                 |
+| CI_BUILD_GATE               | PASS (local)                                            | Actions not yet run (no remote)                                         |
