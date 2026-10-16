@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { DICTIONARIES, LANGS, type Lang } from "@/i18n";
 import { PortfolioView } from "@/features/portfolio/PortfolioView";
+import { JsonLd } from "@/features/seo/JsonLd";
 import { languageAlternates } from "@/lib/seo";
+import { personJsonLd } from "@/lib/structured-data";
 
 export async function generateMetadata({
   params,
@@ -17,6 +19,12 @@ export async function generateMetadata({
   };
 }
 
-export default function PortfolioPage() {
-  return <PortfolioView />;
+export default async function PortfolioPage({ params }: PageProps<"/[lang]/portfolio">) {
+  const { lang } = await params;
+  return (
+    <>
+      <JsonLd data={personJsonLd(lang as Lang, "/portfolio")} />
+      <PortfolioView />
+    </>
+  );
 }

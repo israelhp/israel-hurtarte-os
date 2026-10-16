@@ -14,6 +14,7 @@ const SIZES = [
   { n: "tablet portrait 768x1024", w: 768, h: 1024, touch: true },
   { n: "phone 390x844", w: 390, h: 844, touch: true },
   { n: "small phone 360x640", w: 360, h: 640, touch: true },
+  { n: "tiny phone 320x568 (≈400% zoom)", w: 320, h: 568, touch: true },
   { n: "phone landscape 844x390", w: 844, h: 390, touch: true },
 ] as const;
 const APPS = [

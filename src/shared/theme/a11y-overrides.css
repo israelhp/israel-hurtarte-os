@@ -90,3 +90,36 @@
   container-type: inline-size;
   overflow-x: hidden;
 }
+
+/* Skip link (WCAG 2.4.1): hidden until it receives keyboard focus, then shown on top of everything. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 5000;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--sheet, #fff);
+  color: var(--label, #000);
+  border: 0.5px solid var(--sep2, #888);
+  font-size: 13px;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* Performance (Phase 8). The prototype fades whole pages in (`.desk`, `.pf`, 0.3s). That delayed the largest
+   contentful paint and, on the scrolling Portfolio View, Chrome never reported an LCP at all. Windows opened
+   on page load also skip their entry animation (class set by the window manager); later opens still animate. */
+.desk,
+.pf,
+.win.no-enter {
+  animation: none;
+}
+
+/* The prototype's `.pd h4 { margin: 0 0 8px }` wins over `.sect h4` inside the project detail view. */
+.pd .sect > h2,
+.pd .sect > h3 {
+  margin-bottom: 8px;
+}

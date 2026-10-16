@@ -156,4 +156,5 @@ export const en: Dictionary = {
   link_website: "Website",
   stack_related_real: "Related projects",
   stack_none_real: "No related projects yet.",
+  skip_to_content: "Skip to content",
 };

@@ -4,7 +4,7 @@ import { Button, LinkRow } from "@/shared/components";
 import { Icon } from "@/shared/icons/Icon";
 import { profile } from "@/content/profile";
 import { socialLinks } from "@/content/social-links";
-import { safeHref } from "@/lib/safe-href";
+import { safeHref, safeLocalPath } from "@/lib/safe-href";
 import type { Dictionary } from "@/i18n";
 import { useT } from "@/features/settings/hooks";
 
@@ -47,10 +47,16 @@ export function LinkList({ withLocation }: { withLocation?: boolean }) {
 /** Download-CV button; disabled with an honest label while no CV URL is configured. */
 export function CvButton({ primary }: { primary?: boolean }) {
   const t = useT();
-  const href = safeHref(profile.cvUrl);
+  const local = safeLocalPath(profile.cvUrl);
+  const href = local ?? safeHref(profile.cvUrl);
   if (href)
     return (
-      <Button href={href} variant={primary ? "primary" : "default"}>
+      <Button
+        href={href}
+        variant={primary ? "primary" : "default"}
+        // a file shipped with the site downloads; an external URL opens as a normal safe link
+        {...(local ? { download: local.split("/").pop() } : {})}
+      >
         <Icon name="download" />
         {t.cv}
       </Button>

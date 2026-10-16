@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { safeHref } from "./safe-href";
+import { safeHref, safeLocalPath } from "./safe-href";
 
 describe("safeHref", () => {
   it("accepts http, https and mailto", () => {
@@ -19,5 +19,28 @@ describe("safeHref", () => {
       "file:///etc/passwd",
     ])
       expect(safeHref(bad), bad).toBeNull();
+  });
+});
+
+describe("safeLocalPath", () => {
+  it("accepts same-site file paths", () => {
+    expect(safeLocalPath("/cv/Israel-Hurtarte-CV.pdf")).toBe("/cv/Israel-Hurtarte-CV.pdf");
+    expect(safeLocalPath("  /cv/a_b.pdf ")).toBe("/cv/a_b.pdf");
+  });
+  it("rejects anything that could leave the site or climb directories", () => {
+    for (const bad of [
+      "",
+      "cv/a.pdf",
+      "//evil.com/a.pdf",
+      "/../etc/passwd",
+      "/cv/../a.pdf",
+      "/a b.pdf",
+      "/a.pdf?x=1",
+      "\\evil",
+      "https://x.test/a.pdf",
+      "javascript:alert(1)",
+      "/cv/\u0000.pdf",
+    ])
+      expect(safeLocalPath(bad), bad).toBeNull();
   });
 });

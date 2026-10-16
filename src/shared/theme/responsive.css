@@ -45,11 +45,13 @@
   }
 }
 
-/* 4. Links in rows keep a 24px-high target. */
+/* 4. Links in rows keep a 24px-high target without changing the row height (the 2px negative margins cancel
+   the extra height; a plain min-height shifted every row by 1–2px relative to the prototype). */
 .link-row a {
   display: inline-flex;
   align-items: center;
   min-height: 24px;
+  margin-block: -2px;
 }
 
 /* 5. Hover-only effects must not stick after a tap on devices that cannot hover (not on compact screens,
@@ -142,5 +144,23 @@
 @media (max-height: 500px) {
   .pf-nav {
     position: static;
+  }
+}
+
+/* 9. 320px wide (iPhone SE, or 400% zoom): the compact menu bar needed 336px. Tighten gaps and paddings. */
+@media (max-width: 360px) {
+  .topbar {
+    gap: 2px;
+    padding-left: 8px;
+    padding-right: 4px;
+  }
+  .topbar .icon-btn {
+    width: 28px;
+  }
+  .topbar .seg button {
+    padding: 3px 7px;
+  }
+  .topbar .pv-btn {
+    padding: 4px 7px;
   }
 }

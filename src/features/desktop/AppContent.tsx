@@ -3,13 +3,14 @@
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import type { AppId } from "@/shared/app-ids";
+import { HomeApp } from "@/features/apps/home/HomeApp";
 
 // Each app is its own chunk, fetched the first time its window opens.
 const load = <T extends ComponentType>(fn: () => Promise<T>) =>
   dynamic(fn, { loading: () => null });
 
 const APPS: Record<AppId, ComponentType> = {
-  home: load(() => import("@/features/apps/home/HomeApp").then((m) => m.HomeApp)),
+  home: HomeApp, // opens on load, so it ships in the main chunk instead of costing a second round trip
   about: load(() => import("@/features/apps/about/AboutApp").then((m) => m.AboutApp)),
   stack: load(() => import("@/features/apps/stack/StackApp").then((m) => m.StackApp)),
   projects: load(() => import("@/features/projects/ProjectsApp").then((m) => m.ProjectsApp)),

@@ -7,6 +7,7 @@ import { trackInteraction } from "@/features/window-manager/interaction";
 import { useWm } from "@/features/window-manager/store";
 import { WindowLayer } from "@/features/window-manager/WindowLayer";
 import { MenuBar } from "./MenuBar";
+import { SkipLink } from "./SkipLink";
 import { SettingsPopover } from "./SettingsPopover";
 import { Shortcuts } from "./Shortcuts";
 
@@ -33,7 +34,8 @@ export function Desktop() {
 
   return (
     <div className="os">
-      <main className="desk">
+      <SkipLink target="desktop" />
+      <main className="desk" id="desktop" tabIndex={-1}>
         <h1 className="sr-only">{SITE.name}</h1>
         <div className="wall" />
         <div className="wall-mark" aria-hidden="true">

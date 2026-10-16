@@ -155,6 +155,7 @@ export const es = {
   link_website: "Sitio web",
   stack_related_real: "Proyectos relacionados",
   stack_none_real: "Aún no hay proyectos relacionados.",
+  skip_to_content: "Saltar al contenido",
 } as const;
 
 export type Dictionary = { [K in keyof typeof es]: string };

@@ -10,18 +10,30 @@ process.stdin.on("end", () => {
     process.exit(0);
   }
   const rules = [
-    [/\brm\s+(-[a-zA-Z]*r[a-zA-Z]*f|-[a-zA-Z]*f[a-zA-Z]*r)\b/, "rm -rf is not allowed"],
-    [/\bgit\s+push\b[^\n]*(--force|-f\b|--force-with-lease)/, "force push is not allowed"],
-    [/\bgit\s+reset\s+--hard\b/, "git reset --hard is not allowed"],
-    [/\bgit\s+clean\s+-[a-zA-Z]*f/, "git clean -f is not allowed"],
-    [/\bgit\s+push\b[^\n]*\b(main|master)\b/, "push to main/master needs explicit owner approval"],
+    // recursive + force deletion in any spelling: -rf, -fr, -r -f, --recursive --force, find -delete
+    [
+      /\brm\b(?=[^\n;&|]*(?:\s-[a-zA-Z]*[rR]|\s--recursive))(?=[^\n;&|]*(?:\s-[a-zA-Z]*f|\s--force))/,
+      "recursive forced delete is not allowed",
+    ],
+    [/\bfind\b[^\n;&|]*\s-delete\b/, "find -delete is not allowed"],
+    // `git` may carry global options before the subcommand (git -C dir push …)
+    [
+      /\bgit\b[^\n;&|]*\bpush\b[^\n;&|]*(--force\b|--force-with-lease|--force-if-includes|\s-[a-zA-Z]*f\b|\s\+\S)/,
+      "force push is not allowed",
+    ],
+    [/\bgit\b[^\n;&|]*\breset\b[^\n;&|]*--hard\b/, "git reset --hard is not allowed"],
+    [/\bgit\b[^\n;&|]*\bclean\b[^\n;&|]*\s-[a-zA-Z]*f/, "git clean -f is not allowed"],
+    [
+      /\bgit\b[^\n;&|]*\bpush\b[^\n;&|]*(?:\s|:|\/)(?:main|master)\b/,
+      "push to main/master needs explicit owner approval",
+    ],
     [
       /\bvercel\b[^\n]*--prod\b|\bvercel\s+deploy\b[^\n]*--prod/,
       "production deploy needs owner approval",
     ],
     [
-      /\b(curl|wget)\b[^\n]*\|\s*(sudo\s+)?(ba|z)?sh\b/,
-      "piping downloads into a shell is not allowed",
+      /\b(curl|wget)\b[^\n]*\|\s*(sudo\s+)?(?:(?:ba|z|da)?sh|python3?|node|perl|ruby)\b/,
+      "piping downloads into a shell or interpreter is not allowed",
     ],
     [/\bsudo\b/, "sudo is not allowed"],
     [

@@ -8,14 +8,17 @@
 - D4 Demo projects and placeholder certifications stay visible with their DEMO/PLACEHOLDER labels until replaced.
 - D5 Contact via `mailto:`. D6 Solid background instead of blur at <=760px. D7 All 12 agents. D8 Zustand (acceptable if everything works correctly). D9 "Prototype/DEMO" copy kept as is. D10 Missing data (CV, website, screenshots, domain) added later by the owner.
 
-## Pending owner decisions (Phase 7, from the CV)
+## Owner decisions on the CV (2026-10-16)
 
-- D11 Publish your phone number? Default: **no** (spam/scraping). It would be a `tel:`/WhatsApp link, never plain text in a public page.
-- D12 CV download: give me a public PDF without phone and references, or authorize me to generate one from the site content.
-- D13 Confirm the ◐ items (docs/content/cv-reconciliation.md): content on the site that the CV does not mention (SQL/reporting/dashboards, REST API work, Angular/Ionic/Cordova/Postman…, the whole VisionBitt entry). Nothing was removed.
-- D14 Bio: keep the current passion-based bio, or replace/merge with the CV summary ("4 años de experiencia … banca empresarial y tarjetas de crédito … ACH").
-- D15 Soft skills from the CV: add a small card (new UI, not in the prototype) or omit.
-- D16 Languages: the CV lists only Spanish; add an "Idiomas" line (with English level?) or omit. Nothing about language level is claimed today.
+- D11 **Do not publish the phone number** as text or link anywhere on the site (JSON-LD included).
+- D12 **The CV PDF may be used even though it contains the owner's own phone.** The public copy
+  `public/cv/Israel-Hurtarte-CV.pdf` is the owner's PDF with only the _references_ section removed (text removed, not
+  covered): the four references are third parties who have not agreed to be published. The owner's own phone stays,
+  as decided. To publish the original instead, replace the file after the references agree (`tools/check-public-pdf.py`
+  reports what a PDF contains without printing it).
+- D13 **Nothing already on the page is modified**, and the CV adds nothing beyond what Phase 7 already added. The ◐
+  items in docs/content/cv-reconciliation.md stay as they are.
+- D14 Keep the current bio. D15 Soft skills omitted. D16 Languages omitted.
 
 ## Technical decisions
 
@@ -36,6 +39,9 @@
 
 - T12 Demo/placeholder notices are rendered only while such items exist, and e2e counts/names derive from `src/content` (checked by swapping content). See docs/content/EDITING.md.
 - T13 Privacy guard (`src/lib/pii.ts`): tests fail if phone-shaped numbers, `tel:`/WhatsApp links or "references" headings appear in content or rendered pages. It is a heuristic and cannot detect names; the CV (owner's phone, four third-party references) is never copied into the repo.
+
+- T14 Phase 8: e2e runs against a dependency-free static server that applies the exact `vercel.json` headers (`tools/serve-with-headers.mjs`), so CSP violations are real; `serve` was removed (its `compression` dependency had an advisory). Latency guards run in an isolated `perf` project. The visual gate compares against the original prototype (docs/engineering/design-fidelity.md).
+- T15 Global CSS added to match the prototype where Tailwind's reset differs: heading weight, `ul` discs, inline `svg`.
 
 ## Accepted risks
 

@@ -45,7 +45,7 @@ test.describe("Home", () => {
 });
 
 test.describe("About", () => {
-  test("renders real profile data, safe links and an honest CV state", async ({ page }) => {
+  test("renders real profile data, safe links and the CV state", async ({ page }) => {
     const w = await openApp(page, "about");
     await expect(w.getByRole("heading", { name: "Israel Hurtarte" })).toBeVisible();
     await expect(w.locator(".chips .chip")).toHaveCount(profile.specialties.es.length);
@@ -64,7 +64,14 @@ test.describe("About", () => {
       /^https:\/\/www\.linkedin\.com\/in\/israel-hurtarte-/,
     );
     await expect(w.locator(".nc")).toContainText("No configurado");
-    await expect(w.getByRole("button", { name: /Descargar CV/ })).toBeDisabled();
+    if (profile.cvUrl) {
+      // a CV shipped with the site is a real download link
+      const cv = w.getByRole("link", { name: /Descargar CV/ });
+      await expect(cv).toHaveAttribute("href", profile.cvUrl);
+      await expect(cv).toHaveAttribute("download", /\.pdf$/);
+    } else {
+      await expect(w.getByRole("button", { name: /Descargar CV/ })).toBeDisabled();
+    }
   });
 });
 
@@ -433,4 +440,32 @@ test("a failed submit moves focus to the first invalid field", async ({ page }) 
   await w.getByLabel("Nombre").fill("Ana");
   await w.getByRole("button", { name: "Enviar mensaje" }).click();
   await expect(w.getByLabel("Correo", { exact: true })).toBeFocused();
+});
+
+test.describe("CV download", () => {
+  test.skip(!profile.cvUrl, "no CV configured");
+
+  test("the CV file is served as a real PDF", async ({ request }) => {
+    const res = await request.get(profile.cvUrl);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("pdf");
+    const body = await res.body();
+    expect(body.subarray(0, 5).toString()).toBe("%PDF-");
+    expect(body.length).toBeGreaterThan(10_000);
+  });
+
+  test("the download is offered in About, Contact and Portfolio View", async ({ page }) => {
+    for (const id of ["about", "contact"]) {
+      const w = await openApp(page, id);
+      await expect(w.getByRole("link", { name: /Descargar CV/ })).toHaveAttribute(
+        "href",
+        profile.cvUrl,
+      );
+    }
+    await page.goto("/en/portfolio");
+    await expect(page.getByRole("link", { name: /Download CV/ })).toHaveAttribute(
+      "href",
+      profile.cvUrl,
+    );
+  });
 });

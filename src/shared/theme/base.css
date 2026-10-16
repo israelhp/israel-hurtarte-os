@@ -98,3 +98,24 @@ a:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* Tailwind's preflight resets heading weight to `inherit`; the prototype has no reset, so its headings use the
+   browser default (bold) wherever its CSS does not set a weight. Found by the visual comparison (Phase 8). */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+/* More preflight resets the prototype does not have (found by the visual comparison, Phase 8):
+   bullet lists keep their discs and inline icons stay inline (so `text-align: center` centres them). */
+ul {
+  list-style: disc;
+}
+svg {
+  display: inline;
+  vertical-align: baseline;
+}

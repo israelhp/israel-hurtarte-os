@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
 import type { AppId } from "@/shared/app-ids";
 import { Icon } from "@/shared/icons/Icon";
 import { cn } from "@/lib/cn";
@@ -34,8 +41,12 @@ export function Window({ id, children }: { id: AppId; children: ReactNode }) {
   const active = useWm((s) => s.active === id);
   const { focus, close, minimize, toggleMax, move } = useWm.getState();
   const ref = useRef<HTMLElement>(null);
+  // The window that opens on page load appears at once (a 220ms fade-in delayed the largest contentful paint).
+  const [skipEnter] = useState(() => !hasInteracted());
   const drag = useRef<Drag | null>(null);
   const title = windowTitle(t, id);
+  // The terminal title carries the prototype's shell-prompt suffix; the accessible name must start with what is shown.
+  const shownTitle = id === "terminal" ? `${title} — visitor@hurtarte — zsh` : title;
 
   const openTick = useWm((s) => s.openTick);
   // Take keyboard focus only on an explicit open request (Dock, menu, shortcut, terminal), never on page
@@ -137,7 +148,7 @@ export function Window({ id, children }: { id: AppId; children: ReactNode }) {
       tabIndex={-1}
       aria-label={title}
       data-win={id}
-      className={cn("win", w.max && "max", w.anim, active && "active")}
+      className={cn("win", w.max && "max", w.anim, active && "active", skipEnter && "no-enter")}
       style={{ left: w.x, top: w.y, width: w.w, height: w.h, zIndex: 10 + w.z }}
       onPointerDown={() => focus(id)}
       onKeyDown={onKeyDown}
@@ -183,11 +194,11 @@ export function Window({ id, children }: { id: AppId; children: ReactNode }) {
           className="wtitle"
           tabIndex={0}
           role="button"
-          aria-label={`${title}. ${t.move_window}`}
+          aria-label={`${shownTitle}. ${t.move_window}`}
           onKeyDown={onTitleKey}
         >
           <Icon name={APP_ICONS[id]} />
-          <span>{title}</span>
+          <span>{shownTitle}</span>
         </div>
         <div className="tb-pad" />
       </header>

@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { Icon } from "@/shared/icons/Icon";
+import { emit } from "@/lib/events";
 import { AccentPicker, Segmented } from "@/shared/components";
 import { ACCENTS, type Accent } from "@/shared/theme/options";
 import { LANGS } from "@/i18n";
@@ -87,6 +89,17 @@ export function SettingsPopover() {
           <Icon name="help" />
           {t.tour_btn}
         </button>
+        <Link
+          href={`/${lang}/portfolio`}
+          className="pop-btn"
+          onClick={() => {
+            setSettingsOpen(false);
+            emit("portfolio");
+          }}
+        >
+          <Icon name="layout" />
+          {t.nav_portfolio}
+        </Link>
         <button
           type="button"
           className="pop-btn"

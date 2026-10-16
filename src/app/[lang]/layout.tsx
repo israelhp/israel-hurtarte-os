@@ -19,6 +19,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
+  // browser chrome follows the prototype's desktop base colors (dark #0C1424, light #E4E9EF)
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0C1424" },
+    { media: "(prefers-color-scheme: light)", color: "#E4E9EF" },
+  ],
 };
 
 export function generateStaticParams() {

@@ -9,3 +9,12 @@ export function safeHref(href: string): string | null {
     return null;
   }
 }
+
+/**
+ * Same-site file path such as `/cv/file.pdf`: starts with a single `/`, only URL-safe characters, no `..`.
+ * (`safeHref` rejects these because they are not absolute URLs.)
+ */
+export function safeLocalPath(path: string): string | null {
+  const value = path.trim();
+  return /^\/(?!\/)[\w\-./]+$/.test(value) && !value.includes("..") ? value : null;
+}

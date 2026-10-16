@@ -52,5 +52,7 @@ export const profile: Profile = {
       "Principios ágiles",
     ],
   },
-  cvUrl: "",
+  // Public copy of the owner's CV: the owner's own phone stays (their decision), the references section was
+  // removed. Everything in public/ is published; check a new file with tools/check-public-pdf.py first.
+  cvUrl: "/cv/Israel-Hurtarte-CV.pdf",
 };

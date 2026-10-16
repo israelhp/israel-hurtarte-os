@@ -26,12 +26,14 @@ All editable content lives in `src/content/` (TypeScript, validated by `types.ts
 
 Replace the placeholders with real ones (`status: "verified"`, real `name`, `org`, `date`, optional `link`). A "verified" entry containing the template text fails the tests.
 
-## CV download — `profile.ts`
+## CV download — `profile.cvUrl`
 
-`cvUrl: ""` shows a disabled "Descargar CV · No configurado" button. To enable it:
-
-1. Make a **public** PDF: no phone number, no references. **Open it and read it page by page before copying it** — no automated check looks inside a PDF, and everything in `public/` is published.
-2. Save it as `public/cv/<name>.pdf` and set `cvUrl: "/cv/<name>.pdf"` (or a full https URL). A test fails if the file does not exist.
+Currently `/cv/Israel-Hurtarte-CV.pdf`: the owner's CV **without the references section** (their own phone number stays,
+by the owner's decision). To replace it: put the new PDF in `public/cv/`, set `cvUrl`, and **open it and read it page by
+page first** — everything under `public/` is published and no test looks inside a PDF.
+`python3 tools/check-public-pdf.py public/cv/<file>.pdf` (needs `pip install pymupdf`) reports how many phone-shaped
+numbers, e-mails and links it contains without printing them. A test fails if the file does not exist.
+Empty string = a disabled "Download CV · Not configured" button.
 
 ## Other links — `social-links.ts`
 

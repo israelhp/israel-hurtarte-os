@@ -10,15 +10,23 @@ export default defineConfig({
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: { baseURL: `http://localhost:${PORT}`, trace: "on-first-retry" },
   webServer: {
-    command: `npx serve out -l ${PORT}`,
+    command: `node tools/serve-with-headers.mjs ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
   },
   projects: [
     {
       name: "desktop",
+      testIgnore: /perf\.spec\.ts/,
       use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
     },
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    { name: "mobile", testIgnore: /perf\.spec\.ts/, use: { ...devices["Pixel 7"] } },
+    {
+      // latency measurements must not compete with other workers for the CPU: this project waits for the others
+      name: "perf",
+      testMatch: /perf\.spec\.ts/,
+      dependencies: ["desktop", "mobile"],
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+    },
   ],
 });

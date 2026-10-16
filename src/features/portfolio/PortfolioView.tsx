@@ -13,6 +13,7 @@ import { profile } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { categories, skills } from "@/content/skills";
 import { CvButton, LinkList } from "@/features/apps/LinkList";
+import { SkipLink } from "@/features/desktop/SkipLink";
 import { useApps } from "@/features/apps/store";
 import { ProjectCover } from "@/features/projects/ProjectCover";
 import { useLang, useT } from "@/features/settings/hooks";
@@ -53,6 +54,7 @@ export function PortfolioView() {
   return (
     <div className="os">
       <div className="pf">
+        <SkipLink target="portfolio-main" />
         <header className="pf-nav">
           <Link href={desktopHref} className="logo">
             <span className="logo-dot" />
@@ -77,7 +79,7 @@ export function PortfolioView() {
         </header>
 
         <div className="pf-wrap">
-          <main>
+          <main id="portfolio-main" tabIndex={-1}>
             <div className="hero">
               <div className="h-eyebrow" style={{ position: "relative" }}>
                 {SITE.name} · {profile.location}

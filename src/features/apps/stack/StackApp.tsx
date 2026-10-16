@@ -1,5 +1,6 @@
 "use client";
 
+import { useDeferredValue } from "react";
 import {
   DemoTag,
   Detail,
@@ -27,7 +28,8 @@ export function StackApp() {
     useApps();
 
   const catName = (id: string) => categories.find((c) => c.id === id)?.label[lang] ?? "";
-  const q = stackQuery.trim().toLowerCase();
+  // Typing stays instant; the 30+ cards re-filter at lower priority (keeps keystrokes well under 200ms on slow CPUs).
+  const q = useDeferredValue(stackQuery).trim().toLowerCase();
   const items = skills.filter(
     (k) =>
       (stackCat === "all" || k.cat === stackCat) &&

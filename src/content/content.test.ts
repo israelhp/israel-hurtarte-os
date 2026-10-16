@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { findPhoneLike, REFERENCE_WORDS } from "@/lib/pii";
-import { safeHref } from "@/lib/safe-href";
+import { safeHref, safeLocalPath } from "@/lib/safe-href";
 import { certifications } from "./certifications";
 import { education } from "./education";
 import { experience } from "./experience";
@@ -228,6 +228,8 @@ describe("content integrity", () => {
     }
     expect(socialLinks.find((l) => l.id === "email")?.href).toBe("mailto:israelhurtarte@gmail.com");
     expect(socialLinks.find((l) => l.id === "website")?.value).toBe("");
-    expect(profile.cvUrl).toBe("");
+    // the CV is a same-site file or a safe https link (or empty when not configured)
+    if (profile.cvUrl)
+      expect(safeLocalPath(profile.cvUrl) ?? safeHref(profile.cvUrl)).not.toBeNull();
   });
 });
