@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import {
@@ -21,6 +22,10 @@ const openApp = async (p: Page, id: string) => {
   await expect(win(p, id)).toBeVisible();
   return win(p, id);
 };
+
+/** "Demo" for demo projects and for links the owner calls a demo; "Sitio web" otherwise. */
+const linkLabel = (p: { status: string; linkKind?: string }) =>
+  (p.linkKind ?? (p.status === "verified" ? "website" : "demo")) === "demo" ? "Demo" : "Sitio web";
 
 test.beforeEach(async ({ page }) => {
   // The guided tour auto-starts on a first visit; these tests are about the rest of the UI.
@@ -113,21 +118,56 @@ test.describe("Tech Stack", () => {
 });
 
 test.describe("Projects", () => {
-  test("lists the projects, labels demo ones and filters by folder", async ({ page }) => {
+  test("lists the projects, labels demo ones and offers only folders that have projects", async ({
+    page,
+  }) => {
     expect(projects.length, "the portfolio needs at least one project").toBeGreaterThan(0);
     const w = await openApp(page, "projects");
     await expect(w.locator(".pcard")).toHaveCount(projects.length);
     await expect(w.locator(".pcard .demo-tag")).toHaveCount(demoProjects.length);
     // the "DEMO DATA" banner only exists while demo projects do
     await expect(w.locator(".toolbar .demo-tag")).toHaveCount(demoProjects.length ? 1 : 0);
-    const featured = projectsIn("featured");
-    await w.getByRole("button", { name: /^Destacados/ }).click();
-    await expect(w.locator(".pcard")).toHaveCount(featured.length);
-    const mobile = projectsIn("mobile");
-    await w.getByRole("button", { name: /^Móvil/ }).click();
-    await expect(w.locator(".pcard")).toHaveCount(mobile.length);
-    if (mobile.length) await expect(w.locator(".pcard").first()).toContainText(mobile[0].name);
-    else await expect(w.getByText("Aún no hay proyectos en esta carpeta.")).toBeVisible();
+    const FOLDERS = {
+      featured: "Destacados",
+      personal: "Personales",
+      professional: "Profesionales",
+      web: "Web",
+      mobile: "Móvil",
+      backend: "Backend",
+      databases: "Bases de datos",
+      devops: "DevOps",
+    } as const;
+    for (const [id, label] of Object.entries(FOLDERS)) {
+      const inFolder = projectsIn(id as keyof typeof FOLDERS);
+      const button = w.getByRole("button", { name: new RegExp(`^${label}`) });
+      if (inFolder.length === 0) {
+        await expect(button, `${label}: empty folders are not offered`).toHaveCount(0);
+        continue;
+      }
+      await button.click();
+      await expect(w.locator(".pcard")).toHaveCount(inFolder.length);
+      await expect(w.locator(".pcard").first()).toContainText(inFolder[0].name);
+    }
+  });
+
+  test("a project with a website shows the button beside 'Ver detalles' on its card", async ({
+    page,
+  }) => {
+    const w = await openApp(page, "projects");
+    for (const p of projects.filter((x) => x.demoUrl)) {
+      const card = w.locator(".pcard", { hasText: p.name });
+      const site = card.getByRole("link", { name: linkLabel(p) });
+      const details = card.getByRole("button", { name: /Ver detalles/ });
+      await expect(site).toHaveAttribute("href", p.demoUrl);
+      const a = (await site.boundingBox())!;
+      const b = (await details.boundingBox())!;
+      expect(Math.abs(a.y - b.y), `${p.name}: same row`).toBeLessThan(4);
+      expect(a.x + a.width).toBeLessThanOrEqual(b.x + 1);
+    }
+    // "professional" folder now includes the real project
+    await w.getByRole("button", { name: /^Profesionales/ }).click();
+    for (const p of projectsIn("professional"))
+      await expect(w.locator(".pcard", { hasText: p.name })).toHaveCount(1);
   });
 
   test("detail view shows every section, only real links, and goes back", async ({ page }) => {
@@ -182,6 +222,43 @@ test.describe("Education and Certifications", () => {
     await expect(w).toContainText("Maestría en Seguridad Informática");
     await expect(w).toContainText("Ingeniería en Sistemas");
     await expect(w).toContainText("Colegio Verbo No. 4");
+  });
+
+  test("certifications: every real course links to its own public EDteam certificate page", async ({
+    page,
+  }) => {
+    const w = await openApp(page, "certs");
+    const real = certifications.filter((c) => c.status === "verified" && c.link);
+    expect(real.length).toBeGreaterThan(0);
+    for (const c of real) {
+      const link = w.getByRole("link", { name: `Credencial — ${c.name}` });
+      await expect(link, c.name).toHaveAttribute("href", c.link);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
+    // the source shows no issue date, so no date row is rendered for them
+    await expect(w.locator(".ecard .kv", { hasText: "Fecha" })).toHaveCount(
+      certifications.filter((c) => c.date).length,
+    );
+    // no placeholder notice once nothing is a placeholder
+    if (placeholderCerts.length === 0) await expect(w.locator(".note")).toHaveCount(0);
+  });
+
+  test("certification filters only offer categories that have certifications", async ({ page }) => {
+    const w = await openApp(page, "certs");
+    const used = new Set(certifications.map((c) => c.cat));
+    const labels: Record<string, string> = {
+      cloud: "Nube",
+      dev: "Desarrollo",
+      data: "Datos",
+      security: "Seguridad",
+    };
+    await expect(w.getByRole("button", { name: "Todas" })).toBeVisible();
+    for (const [id, label] of Object.entries(labels)) {
+      await expect(w.getByRole("button", { name: label, exact: true }), id).toHaveCount(
+        used.has(id as never) ? 1 : 0,
+      );
+    }
   });
 
   test("certifications: placeholders are labelled, real ones are not, and the filter works", async ({
@@ -331,11 +408,97 @@ test.describe("Contact (mailto, honest)", () => {
   });
 });
 
+test("project cards: status, website/demo and details sit on one line", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "narrow screens may wrap the status label by design");
+  for (const lang of ["ES", "EN"]) {
+    await page.getByRole("button", { name: lang, exact: true }).click();
+    const w = await openApp(page, "projects");
+    const cards = w.locator(".pcard");
+    await expect(cards).toHaveCount(projects.length);
+    for (let i = 0; i < projects.length; i++) {
+      const tops = await cards
+        .nth(i)
+        .locator(".pc-foot")
+        .evaluate((foot) =>
+          [...foot.querySelectorAll(".status, .pc-actions a, .pc-actions button")].map((e) => {
+            const r = e.getBoundingClientRect();
+            return Math.round(r.top + r.height / 2);
+          }),
+        );
+      expect(tops.length).toBeGreaterThanOrEqual(2);
+      expect(
+        Math.max(...tops) - Math.min(...tops),
+        `${lang} card ${i}: ${tops}`,
+      ).toBeLessThanOrEqual(2);
+    }
+  }
+});
+
+test.describe("project demo video", () => {
+  const withVideo = projects.find((p) => p.video)!;
+  const openDetail = async (page: Page) => {
+    const w = await openApp(page, "projects");
+    await w
+      .locator(".pcard", { hasText: withVideo.name })
+      .getByRole("button", { name: /Ver detalles/ })
+      .click();
+    return w;
+  };
+
+  test("shows a controllable, non-autoplaying player when the file exists", async ({ page }) => {
+    await page.route(`**${withVideo.video!.src}`, (route) =>
+      route.fulfill({ contentType: "video/mp4", body: readFileSync("tests/fixtures/tiny.mp4") }),
+    );
+    const w = await openDetail(page);
+    const video = w.locator("video");
+    await expect(video).toHaveAttribute("src", withVideo.video!.src);
+    await expect(video).toHaveAttribute("controls", "");
+    await expect(video).not.toHaveAttribute("autoplay", /.*/);
+    await expect(video).toHaveAccessibleName("Video de demostración del proyecto");
+    await expect(w.getByRole("heading", { name: "Video de demostración" })).toBeVisible();
+  });
+
+  test("hides the section instead of showing a broken player when the file is missing", async ({
+    page,
+  }) => {
+    await page.route(`**${withVideo.video!.src}`, (route) =>
+      route.fulfill({ status: 404, body: "" }),
+    );
+    const w = await openDetail(page);
+    await expect(w.getByRole("heading", { name: withVideo.name })).toBeVisible();
+    await expect(w.locator("video")).toHaveCount(0);
+  });
+});
+
+test("project cards are all the same size and show only the main technologies", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === "mobile", "one column on phones: heights are independent");
+  const w = await openApp(page, "projects");
+  const cards = w.locator(".pcard");
+  await expect(cards).toHaveCount(projects.length);
+  const heights = await cards.evaluateAll((els) =>
+    els.map((e) => Math.round(e.getBoundingClientRect().height)),
+  );
+  expect(new Set(heights).size, `card heights: ${heights}`).toBe(1);
+  for (const p of projects) {
+    const card = cards.filter({ hasText: p.name });
+    const shown = Math.min(p.cardStack?.length ?? p.stack.length, 4);
+    await expect(card.locator(".chip")).toHaveCount(p.stack.length > shown ? shown + 1 : shown);
+    if (p.stack.length > shown)
+      await expect(card.locator(".chip").last()).toHaveText(`+${p.stack.length - shown}`);
+    // the detail lists every technology
+    await card.getByRole("button", { name: /Ver detalles/ }).click();
+    await expect(w.locator(".pd .chip")).toHaveCount(p.stack.length);
+    await w.getByRole("button", { name: /^Volver/ }).click();
+  }
+});
+
 test("switching to English translates app content", async ({ page }) => {
   const w = await openApp(page, "projects");
   await page.getByRole("button", { name: "EN", exact: true }).click();
-  await expect(w.getByRole("button", { name: /^Featured/ })).toBeVisible();
-  await expect(w.getByRole("button", { name: /^Mobile/ })).toBeVisible();
+  await expect(w.getByRole("button", { name: /^All Projects/ })).toBeVisible();
+  await expect(w.getByRole("button", { name: /^Professional/ })).toBeVisible();
   await expect(win(page, "projects")).toHaveAttribute("aria-label", "Projects Explorer");
   await expect(w.locator(".pcard").first()).toContainText("View Details");
 });

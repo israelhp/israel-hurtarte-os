@@ -25,6 +25,7 @@ const TYPES = {
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2",
   ".pdf": "application/pdf",
+  ".mp4": "video/mp4",
   ".ico": "image/x-icon",
 };
 
@@ -52,11 +53,30 @@ createServer((req, res) => {
   const status = file ? 200 : 404;
   try {
     const body = readFileSync(target);
-    res.writeHead(status, {
+    const headers = {
       ...extra,
       "Content-Type": TYPES[extname(target)] ?? "application/octet-stream",
-      "Content-Length": body.length,
-    });
+      "Accept-Ranges": "bytes",
+    };
+    // byte ranges, as Vercel serves them: browsers need them to seek inside a video
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range ?? "");
+    if (file && range && (range[1] || range[2])) {
+      const start = range[1] ? Number(range[1]) : Math.max(body.length - Number(range[2]), 0);
+      const end =
+        range[1] && range[2] ? Math.min(Number(range[2]), body.length - 1) : body.length - 1;
+      if (start > end || start >= body.length) {
+        res.writeHead(416, { ...headers, "Content-Range": `bytes */${body.length}` }).end();
+        return;
+      }
+      res.writeHead(206, {
+        ...headers,
+        "Content-Range": `bytes ${start}-${end}/${body.length}`,
+        "Content-Length": end - start + 1,
+      });
+      res.end(req.method === "HEAD" ? undefined : body.subarray(start, end + 1));
+      return;
+    }
+    res.writeHead(status, { ...headers, "Content-Length": body.length });
     res.end(req.method === "HEAD" ? undefined : body);
   } catch {
     res.writeHead(500).end("server error");

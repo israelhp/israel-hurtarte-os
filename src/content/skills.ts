@@ -249,6 +249,15 @@ export const skills: Skill[] = [
     },
   },
   {
+    name: "SQL",
+    mono: "SQ",
+    cat: "databases",
+    desc: {
+      en: "Standard language for querying and managing relational data.",
+      es: "Lenguaje estándar para consultar y administrar datos relacionales.",
+    },
+  },
+  {
     name: "MongoDB",
     mono: "Mg",
     cat: "databases",

@@ -490,6 +490,32 @@ test.describe("Guided tour", () => {
   }
 });
 
+test("Portfolio View project cards show the website button next to 'Ver detalles'", async ({
+  page,
+}) => {
+  await skipTour(page);
+  await page.goto("/es/portfolio");
+  const withSite = projects.filter((p) => p.demoUrl);
+  expect(withSite.length).toBeGreaterThan(0);
+  for (const p of withSite) {
+    const card = page.locator("#p-projects .pcard", { hasText: p.name });
+    const site = card.getByRole("link", {
+      name:
+        (p.linkKind ?? (p.status === "verified" ? "website" : "demo")) === "demo"
+          ? "Demo"
+          : "Sitio web",
+    });
+    const details = card.getByRole("button", { name: /Ver detalles/ });
+    await expect(site).toHaveAttribute("href", p.demoUrl);
+    await expect(site).toHaveAttribute("rel", "noopener noreferrer");
+    // side by side on the same row of the card footer
+    const a = (await site.boundingBox())!;
+    const b = (await details.boundingBox())!;
+    expect(Math.abs(a.y - b.y), `${p.name}: buttons share a row`).toBeLessThan(4);
+    expect(a.x + a.width, "website button is left of Ver detalles").toBeLessThanOrEqual(b.x + 1);
+  }
+});
+
 test.describe("privacy", () => {
   // The owner's CV contains a phone number and references with phone numbers. None of that may reach the site.
   // Heuristic: no phone-shaped digit runs in visible text, link targets or meta content, and no reference headings.

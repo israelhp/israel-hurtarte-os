@@ -46,6 +46,13 @@ compares screenshots pixel by pixel with `pixelmatch` (threshold 0.12). Diff ima
 - The phone/tablet contexts are not "mobile": the prototype has no `<meta viewport>` and a mobile browser would lay it out at 980 px.
 - Mutation check performed: removing the heading-weight rule makes the Education/Contact/About/Certifications comparisons fail.
 
+## Content that is not in the prototype
+
+The owner's real projects (Zona de Ventas GT, Learn English) replaced the prototype's five fictional ones, and the SQL
+skill does not exist in the prototype either. The Projects window is therefore compared by its frame only (title bar),
+there is no Projects detail comparison, and the Tech Stack uses content both sides have (DevOps, Docker selected). The
+project cards' layout is covered by the e2e and responsive tests instead of pixel comparison.
+
 ## Not covered
 
 Real browsers other than Chromium, other viewports of every window, and animations (reduced motion is forced).

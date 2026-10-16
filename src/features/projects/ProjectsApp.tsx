@@ -16,11 +16,13 @@ import {
 } from "@/shared/components";
 import { Icon } from "@/shared/icons/Icon";
 import { projects } from "@/content/projects";
-import type { Project } from "@/content/types";
 import { safeHref } from "@/lib/safe-href";
 import { useLang, useT } from "@/features/settings/hooks";
 import { useApps, type ProjectFilter } from "../apps/store";
 import { ProjectCover } from "./ProjectCover";
+import { CardStack } from "./CardStack";
+import { ProjectLinks } from "./ProjectLinks";
+import { ProjectVideo } from "./ProjectVideo";
 
 const FOLDERS: ProjectFilter[] = [
   "all",
@@ -34,26 +36,6 @@ const FOLDERS: ProjectFilter[] = [
   "devops",
 ];
 
-function Links({ p, size }: { p: Project; size?: "sm" }) {
-  const t = useT();
-  const demo = safeHref(p.demoUrl);
-  const repo = safeHref(p.repoUrl);
-  return (
-    <>
-      {demo && (
-        <Button href={demo} size={size}>
-          {t.demo}
-        </Button>
-      )}
-      {repo && (
-        <Button href={repo} size={size}>
-          {t.github}
-        </Button>
-      )}
-    </>
-  );
-}
-
 export function ProjectsApp() {
   const t = useT();
   const lang = useLang();
@@ -66,7 +48,8 @@ export function ProjectsApp() {
   return (
     <Split>
       <Side label={t.folders}>
-        {FOLDERS.map((f) => (
+        {/* only folders that contain projects: no dead folders once the demo projects are gone */}
+        {FOLDERS.filter((f) => f === "all" || projects.some((p) => p.tags.includes(f))).map((f) => (
           <SideButton
             key={f}
             active={projectFilter === f}
@@ -106,19 +89,17 @@ export function ProjectsApp() {
                       {p.status === "demo" && <DemoTag />}
                     </div>
                     <p className="pc-desc">{p.desc[lang]}</p>
-                    <Chips>
-                      {p.stack.map((s) => (
-                        <Chip key={s}>{s}</Chip>
-                      ))}
-                    </Chips>
+                    <CardStack p={p} />
                     <div className="pc-foot">
                       <Status>{p.statusLabel[lang]}</Status>
-                      <span style={{ flex: 1 }} />
-                      <Links p={p} size="sm" />
-                      <Button variant="primary" size="sm" onClick={() => setProjectSel(p.id)}>
-                        {t.view_details}
-                        <span className="sr-only"> — {p.name}</span>
-                      </Button>
+                      {/* the buttons stay together; if the card is narrow only the status label drops to its own line */}
+                      <div className="pc-actions">
+                        <ProjectLinks p={p} size="sm" />
+                        <Button variant="primary" size="sm" onClick={() => setProjectSel(p.id)}>
+                          {t.view_details}
+                          <span className="sr-only"> — {p.name}</span>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </article>
@@ -142,6 +123,9 @@ export function ProjectsApp() {
               <Status>{sel.statusLabel[lang]}</Status>
             </div>
             <p>{sel.desc[lang]}</p>
+            {sel.video && (
+              <ProjectVideo src={sel.video.src} title={t.proj_video} label={t.proj_video_label} />
+            )}
             <div className="grid2">
               <SectionCard title={t.objective} headingLevel={3}>
                 <p>{sel.objective[lang]}</p>
@@ -173,6 +157,7 @@ export function ProjectsApp() {
               >
                 {t.architecture}
               </h3>
+              {sel.archNote && <p style={{ margin: "0 0 10px" }}>{sel.archNote[lang]}</p>}
               <div className="arch">{sel.arch}</div>
             </div>
             <SectionCard title={t.challenges} headingLevel={3}>
@@ -183,7 +168,7 @@ export function ProjectsApp() {
               </ul>
             </SectionCard>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Links p={sel} />
+              <ProjectLinks p={sel} />
               {!safeHref(sel.demoUrl) && !safeHref(sel.repoUrl) && (
                 <div className="note">{t.no_links}</div>
               )}

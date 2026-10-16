@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Fragment } from "react";
 import { Button, Chip, Chips, DemoTag, Mono, SectionCard, Status } from "@/shared/components";
 import { Icon } from "@/shared/icons/Icon";
+import { safeHref } from "@/lib/safe-href";
 import { SITE } from "@/lib/site";
 import { certifications } from "@/content/certifications";
 import { education } from "@/content/education";
@@ -16,6 +17,8 @@ import { CvButton, LinkList } from "@/features/apps/LinkList";
 import { SkipLink } from "@/features/desktop/SkipLink";
 import { useApps } from "@/features/apps/store";
 import { ProjectCover } from "@/features/projects/ProjectCover";
+import { CardStack } from "@/features/projects/CardStack";
+import { ProjectLinks } from "@/features/projects/ProjectLinks";
 import { useLang, useT } from "@/features/settings/hooks";
 import { LangSwitch } from "@/features/settings/LangSwitch";
 import { ThemeToggle } from "@/features/settings/ThemeToggle";
@@ -176,16 +179,15 @@ export function PortfolioView() {
                         <Status>{p.statusLabel[lang]}</Status>
                       </div>
                       <p className="pc-desc">{p.desc[lang]}</p>
-                      <Chips>
-                        {p.stack.map((s) => (
-                          <Chip key={s}>{s}</Chip>
-                        ))}
-                      </Chips>
+                      <CardStack p={p} />
                       <div className="pc-foot">
-                        <Button size="sm" onClick={() => openOnDesktop("projects", p.id)}>
-                          {t.view_details}
-                          <span className="sr-only"> — {p.name}</span>
-                        </Button>
+                        <div className="pc-actions" style={{ marginLeft: 0 }}>
+                          <ProjectLinks p={p} size="sm" />
+                          <Button size="sm" onClick={() => openOnDesktop("projects", p.id)}>
+                            {t.view_details}
+                            <span className="sr-only"> — {p.name}</span>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </article>
@@ -253,12 +255,21 @@ export function PortfolioView() {
                       <DemoTag style={{ alignSelf: "flex-start" }}>PLACEHOLDER</DemoTag>
                     )}
                     <h3>{c.name}</h3>
-                    <div className="muted">
-                      {c.org} · {c.date}
-                    </div>
+                    <div className="muted">{c.date ? `${c.org} · ${c.date}` : c.org}</div>
                     <div className="kv">
                       <span>{t.cert_link}</span>
-                      <span className="nc">{t.not_configured}</span>
+                      {safeHref(c.link) ? (
+                        <a
+                          href={safeHref(c.link)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${t.cert_link} — ${c.name}`}
+                        >
+                          {t.cert_link}
+                        </a>
+                      ) : (
+                        <span className="nc">{t.not_configured}</span>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -48,9 +48,17 @@ export type Project = {
   objective: Localized<string>;
   features: Localized<string[]>;
   stack: string[];
+  /** Technologies shown on the project card (the detail shows all of `stack`). Default: the first four. */
+  cardStack?: string[];
   /** ASCII architecture sketch, shown in a monospaced block. */
   arch: string;
+  /** Optional prose description of the architecture, shown above the sketch. */
+  archNote?: Localized<string>;
   challenges: Localized<string[]>;
+  /** Label of the `demoUrl` button: the project's website (default for real projects) or a demo (default for demo projects). */
+  linkKind?: "website" | "demo";
+  /** Screen recording shown in the detail view (file under public/, e.g. "/videos/x.mp4"). Hidden if the file is missing. */
+  video?: { src: string };
   /** Empty string = no public URL. */
   demoUrl: string;
   repoUrl: string;
@@ -89,7 +97,8 @@ export type Certification = {
   status: ContentStatus;
   name: string;
   org: string;
-  date: string;
+  /** Issue date as shown on the credential. Omit when the source shows none (never invent one). */
+  date?: string;
   cat: Exclude<CertCategory["id"], "all">;
   /** Empty string = no credential link. */
   link: string;

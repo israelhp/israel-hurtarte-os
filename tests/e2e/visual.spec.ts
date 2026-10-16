@@ -43,7 +43,7 @@ const WINDOW_TOLERANCE: Record<(typeof APPS)[number], number> = {
   projects: 0.005,
   experience: 0.005,
   education: 0.01,
-  certs: 0.01,
+  certs: 0.6, // content intentionally replaced by the owner's 15 real certifications (layout matched 0.13% with the placeholders)
   terminal: 0.01,
   contact: 0.12, // honest mailto banner (longer text pushes the form down) and the enabled CV button
 };
@@ -185,24 +185,17 @@ for (const scheme of ["dark", "light"] as const) {
       };
       const STEPS: Step[] = [
         {
-          name: "projects-detail",
-          tol: 0.005,
-          run: async (p, k) => {
-            await openApp(p, k, 3);
-            await p
-              .getByRole("button", { name: /View Details/ })
-              .first()
-              .click();
-            await p.waitForTimeout(300);
-          },
-          target: (p, k) => lastWin(p, k, "projects"),
-        },
-        {
           name: "stack-selected",
           tol: 0.02,
           run: async (p, k) => {
             await openApp(p, k, 2);
-            await lastWin(p, k, "stack").locator(".tcard").first().click();
+            // DevOps holds exactly the same technologies in the prototype and the app (the app has extra skills elsewhere)
+            await lastWin(p, k, "stack")
+              .locator(".side-btn", { hasText: /DevOps/ })
+              .click();
+            await lastWin(p, k, "stack")
+              .locator(".tcard", { has: p.locator(".tc-name", { hasText: /^Docker$/ }) })
+              .click();
             await p.waitForTimeout(300);
           },
           target: (p, k) => lastWin(p, k, "stack"),
@@ -322,13 +315,23 @@ for (const scheme of ["dark", "light"] as const) {
           await dockItem(proto, "prototype", i).click();
           await dockItem(app, "app", i).click();
         }
+        // The prototype's fictional projects no longer exist (the owner's real ones replaced them): for Projects only the
+        // window frame (title bar and sidebar header) is compared, see docs/engineering/design-fidelity.md.
         // Content that must be identical for the comparison to make sense: the prototype's Projects/Stack/etc.
         await proto.waitForTimeout(150);
         await app.waitForTimeout(250);
         const pw = proto.locator("section.win").last();
         const aw = winOf(app, "app", i);
         await expect(aw).toBeVisible();
-        const r = diff(`${scheme}-${id}`, await pw.screenshot(), await aw.screenshot());
+        // Projects: only the title bar (Locator.screenshot has no clip, so use the window's box on the page)
+        const grab = async (page: Page, win: ReturnType<Page["locator"]>) => {
+          if (id !== "projects") return win.screenshot();
+          const box = (await win.boundingBox())!;
+          return page.screenshot({
+            clip: { x: box.x, y: box.y, width: Math.min(box.width, 704), height: 48 },
+          });
+        };
+        const r = diff(`${scheme}-${id}`, await grab(proto, pw), await grab(app, aw));
         results.push(
           `${scheme}  window ${id.padEnd(10)} ${(r.ratio * 100).toFixed(2)}%  (tolerance ${(WINDOW_TOLERANCE[id] * 100).toFixed(0)}%)  ${r.w}x${r.h}`,
         );

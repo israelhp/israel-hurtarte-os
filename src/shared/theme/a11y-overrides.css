@@ -123,3 +123,13 @@
 .pd .sect > h3 {
   margin-bottom: 8px;
 }
+
+/* Navigation controls that are links (Portfolio View button, desktop icon, settings entry, portfolio logo) were
+   buttons in the prototype, so the global `a:hover { underline }` must not apply to them. */
+a.pv-btn:hover,
+a.sc:hover,
+a.pop-btn:hover,
+a.logo:hover,
+a.btn:hover {
+  text-decoration: none;
+}

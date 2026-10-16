@@ -47,7 +47,8 @@
 
 /* 4. Links in rows keep a 24px-high target without changing the row height (the 2px negative margins cancel
    the extra height; a plain min-height shifted every row by 1–2px relative to the prototype). */
-.link-row a {
+.link-row a,
+.kv a {
   display: inline-flex;
   align-items: center;
   min-height: 24px;
@@ -163,4 +164,55 @@
   .topbar .pv-btn {
     padding: 4px 7px;
   }
+}
+
+/* Project cards: the website and "Ver detalles" buttons form one group that never splits across lines; in a narrow
+   card the status label wraps instead. Right-aligned like the prototype's lone button. */
+/* All project cards are the same size: rows share the tallest height, the footer sticks to the bottom, long names and
+   descriptions are clamped (the detail view shows everything). */
+.pgrid {
+  grid-auto-rows: 1fr;
+}
+.pc-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pc-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pc-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-left: auto;
+}
+/* Status, website/demo and "Ver detalles" share one line: slightly smaller buttons make it fit the default card width.
+   Below 480px the status wraps to its own line again (touch targets stay >=24px). */
+.pc-foot {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.pc-foot .btn.sm {
+  padding: 4px 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .pc-foot {
+    flex-wrap: wrap;
+  }
+}
+
+/* Project detail: screen recording of an unpublished project */
+.pd-video {
+  display: block;
+  width: 100%;
+  max-height: 60vh;
+  border-radius: 10px;
+  background: #000;
 }

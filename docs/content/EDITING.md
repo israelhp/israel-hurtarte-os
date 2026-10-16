@@ -19,12 +19,17 @@ All editable content lives in `src/content/` (TypeScript, validated by `types.ts
 1. Edit or delete an entry; set `status: "verified"` and fill `demoUrl` / `repoUrl` (or leave them empty).
 2. `stack` entries must match a skill `name` in `skills.ts` (a test checks).
 3. `tags` choose the folders it appears in (`featured`, `personal`, `professional`, `web`, `mobile`, `backend`, `databases`, `devops`); `primary` is the category label; `cover` (1–5) picks one of the generated cover gradients.
-4. Real screenshots are not supported yet (covers are generated); say so when you have images.
+4. A project without a public site leaves `demoUrl: ""`. To show a screen recording in its detail view add
+   `video: { src: "/videos/<name>.mp4" }` and put the file in `public/videos/<name>.mp4` (served as `/videos/<name>.mp4`).
+   Use H.264 MP4 (`ffmpeg -i in.mov -c:v libx264 -crf 28 -preset slow -vf scale=-2:720 -an -movflags +faststart out.mp4`),
+   ideally under ~25 MB. It never autoplays and only its metadata is fetched until play; if the file is missing the
+   section is hidden. Quetxal TV expects `public/videos/quetxal-tv.mp4`.
+5. Real screenshots are not supported yet (covers are generated); say so when you have images.
    The DEMO banners disappear by themselves when no demo project is left.
 
 ## Certifications — `certifications.ts`
 
-Replace the placeholders with real ones (`status: "verified"`, real `name`, `org`, `date`, optional `link`). A "verified" entry containing the template text fails the tests.
+Real entries use `status: "verified"`, `name`, `org`, `cat` and, ideally, a public `link` to the credential. `date` is optional: **leave it out unless the source shows one** (never invent it); the date row is hidden when absent. A "verified" entry containing the template text fails the tests. Filter buttons are generated from the categories in use, so an empty category never shows up. Currently 14 courses are `dev` and Docker is `cloud` (the closest of the four prototype categories); a finer split (Web, Backend, Mobile, DevOps) only needs new entries in `certCategories` and the `CertCategory` type.
 
 ## CV download — `profile.cvUrl`
 

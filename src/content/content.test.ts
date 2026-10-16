@@ -100,19 +100,98 @@ describe("content integrity", () => {
         expect(c.link).toBe("");
       } else {
         // a "verified" certification must not still contain template text
-        expect(`${c.name} ${c.org} ${c.date}`).not.toMatch(
+        expect(`${c.name} ${c.org} ${c.date ?? ""}`).not.toMatch(
           /Certification Name|Issuing Organization|\[Month YYYY\]/,
         );
-        expect(c.name.trim() && c.org.trim() && c.date.trim()).toBeTruthy();
+        expect(c.name.trim() && c.org.trim()).toBeTruthy();
+        if (c.date !== undefined) expect(c.date.trim(), `${c.name} date`).not.toBe(""); // omit instead of leaving blank
       }
       if (c.link) expect(safeHref(c.link), c.name).not.toBeNull();
     }
   });
 
+  it("EDteam certifications: 15 distinct real courses, each linking to its own public certificate page", () => {
+    const real = certifications.filter((c) => c.status === "verified");
+    expect(real).toHaveLength(15);
+    expect(new Set(real.map((c) => c.name)).size).toBe(15);
+    expect(new Set(real.map((c) => c.link)).size).toBe(15);
+    for (const c of real) {
+      expect(c.org, c.name).toBe("EDteam");
+      expect(c.link, c.name).toMatch(
+        /^https:\/\/ed\.team\/u\/israelhurtartepinto\/curso\/[a-z0-9-]+$/,
+      );
+      expect(
+        c.date,
+        `${c.name}: the source shows no issue date, so none may be invented`,
+      ).toBeUndefined();
+    }
+    // Docker is the only non-development course
+    expect(real.filter((c) => c.cat !== "dev").map((c) => c.name)).toEqual(["Docker desde cero"]);
+  });
+
+  it("Zona de Ventas GT: the owner's real project, labelled as such and linking to its live site", () => {
+    const z = projects.find((p) => p.id === "zona-de-ventas-gt")!;
+    expect(z.status).toBe("verified");
+    expect(z.demoUrl).toBe("https://www.zonadeventasgt.com/");
+    expect(z.stack).toEqual(["React", "TypeScript", "Node.js", "Supabase", "PostgreSQL", "SQL"]);
+    expect(z.features.es).toHaveLength(5);
+    expect(z.challenges.en).toHaveLength(4);
+    // the owner confirmed it is a professional project; "personal" and "featured" are not claimed
+    expect(z.tags).toEqual(expect.arrayContaining(["professional", "web", "backend", "databases"]));
+    expect(z.tags).not.toEqual(expect.arrayContaining(["personal"]));
+    expect(z.tags).not.toEqual(expect.arrayContaining(["featured"]));
+  });
+
+  it("Learn English: the owner's personal frontend project, linking to its live demo", () => {
+    const l = projects.find((p) => p.id === "learn-english")!;
+    expect(l.status).toBe("verified");
+    expect(l.demoUrl).toBe("https://learn-english-ivory.vercel.app/");
+    expect(l.linkKind).toBe("demo"); // the owner calls the link a Demo
+    expect(l.stack).toEqual(["React", "JavaScript", "Node.js", "HTML5", "CSS3", "Vercel"]);
+    expect(l.features.es).toHaveLength(5);
+    expect(l.challenges.es).toHaveLength(5);
+    expect(l.tags).toEqual(["personal", "web"]); // personal, not professional or featured
+  });
+
+  it("VisionBitt: professional web project linking to its live site", () => {
+    const v = projects.find((p) => p.id === "visionbitt")!;
+    expect(v.status).toBe("verified");
+    expect(v.tags).toContain("professional");
+    expect(v.demoUrl).toBe("https://www.visionbitt.net/");
+    expect(v.linkKind).toBeUndefined(); // verified => "Sitio web"
+    expect(v.features.es).toHaveLength(7);
+  });
+
+  it("Quetxal TV: academic, unpublished, with its demo video under public/videos", () => {
+    const q = projects.find((p) => p.id === "quetxal-tv")!;
+    expect(q.status).toBe("verified");
+    expect(q.demoUrl).toBe(""); // not published: no invented URL
+    expect(q.tags).not.toContain("personal");
+    expect(q.tags).not.toContain("professional");
+    expect(q.video?.src).toBe("/videos/quetxal-tv.mp4");
+    expect(q.stack).toHaveLength(21);
+    expect(q.features.es).toHaveLength(10);
+  });
+
+  it("VetCare: verified personal web project", () => {
+    const v = projects.find((p) => p.id === "vetcare")!;
+    expect(v.status).toBe("verified");
+    expect(v.tags).toEqual(["personal", "web"]);
+    expect(v.demoUrl).toBe("https://pg-veterinaria.vercel.app/");
+    expect(v.stack).toEqual(["JavaScript", "HTML5", "CSS3", "Vercel"]);
+  });
+
+  it("the prototype's five fictional demo projects are gone", () => {
+    const gone = ["commerce", "fitness", "api", "dblab", "cicd"];
+    expect(projects.map((p) => p.id).filter((id) => gone.includes(id))).toEqual([]);
+    expect(projects.filter((p) => p.status === "demo")).toEqual([]);
+  });
+
   it("project ids are unique and every project technology exists in the skills list", () => {
     expect(new Set(projects.map((p) => p.id)).size).toBe(projects.length);
     const names = new Set(skills.map((s) => s.name));
-    for (const p of projects)
+    // Quetxal TV lists its own (academic) technologies, which the owner has not added to the Tech Stack window
+    for (const p of projects.filter((p) => p.id !== "quetxal-tv"))
       for (const s of p.stack) expect(names.has(s), `${p.id}: ${s}`).toBe(true);
   });
 
@@ -149,8 +228,8 @@ describe("content integrity", () => {
       "Vercel",
       "CI/CD",
     ];
-    // Source 2: owner's CV, "Habilidades" (Java - Spring Boot, C# - .NetCore), added in Phase 7.
-    const cv = ["Java / Spring Boot", "C# / .NET Core"];
+    // Source 2: owner's CV, "Habilidades" (Java - Spring Boot, C# - .NetCore, SQL), added in Phases 7-8.
+    const cv = ["Java / Spring Boot", "C# / .NET Core", "SQL"];
     expect(skills.map((s) => s.name).sort()).toEqual([...owner, ...cv].sort());
   });
 

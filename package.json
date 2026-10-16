@@ -15,7 +15,8 @@
     "test:e2e": "playwright test",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
-    "budget": "node tools/check-budget.mjs"
+    "budget": "node tools/check-budget.mjs",
+    "preview": "node tools/serve-with-headers.mjs 3010"
   },
   "dependencies": {
     "next": "16.4.2",

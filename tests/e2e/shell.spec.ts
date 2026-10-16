@@ -315,3 +315,38 @@ for (const theme of ["dark", "light"] as const) {
     ).toEqual([]);
   });
 }
+
+test("navigation controls that are links never underline on hover", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile", "needs a pointer that can hover");
+  await page.goto("/es");
+  await expect(win(page, "home")).toBeVisible();
+  const underline = (loc: ReturnType<Page["locator"]>) =>
+    loc.evaluate((el) => getComputedStyle(el).textDecorationLine);
+  for (const loc of [
+    page.locator("header.topbar a.pv-btn"), // menu-bar "Portfolio View"
+    page.locator(".shortcuts a.sc"), // desktop icon "Portfolio View"
+  ]) {
+    await loc.hover();
+    expect(await underline(loc)).toBe("none");
+  }
+  await page.getByRole("button", { name: "Configuración" }).click();
+  const entry = page.locator("a.pop-btn");
+  await entry.hover();
+  expect(await underline(entry)).toBe("none");
+  await page.keyboard.press("Escape");
+  await page.goto("/es/portfolio");
+  for (const loc of [
+    page.locator("a.logo"),
+    page.locator("a.pv-btn"),
+    page.locator(".hero a.btn").first(),
+  ]) {
+    await loc.hover();
+    expect(await underline(loc)).toBe("none");
+  }
+  // ordinary text links still underline on hover (the prototype's rule is kept for them)
+  await page.goto("/es");
+  await dock(page, "about").click();
+  const mail = win(page, "about").getByRole("link", { name: "israelhurtarte@gmail.com" });
+  await mail.hover();
+  expect(await underline(mail)).toBe("underline");
+});

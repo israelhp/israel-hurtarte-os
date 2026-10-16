@@ -20,7 +20,10 @@ export function CertsApp() {
         label={t.categories}
         value={certCat}
         onChange={setCertCat}
-        options={certCategories.map((c) => ({ value: c.id, label: c.label[lang] }))}
+        // only categories that have certifications: no dead filters
+        options={certCategories
+          .filter((c) => c.id === "all" || certifications.some((x) => x.cat === c.id))
+          .map((c) => ({ value: c.id, label: c.label[lang] }))}
       />
       <div className="egrid">
         {items.map((c, i) => {
@@ -52,14 +55,21 @@ export function CertsApp() {
                   <span>{t.cert_cat}</span>
                   <span>{catLabel(c.cat)}</span>
                 </div>
-                <div className="kv">
-                  <span>{t.cert_date}</span>
-                  <span>{c.date}</span>
-                </div>
+                {c.date && (
+                  <div className="kv">
+                    <span>{t.cert_date}</span>
+                    <span>{c.date}</span>
+                  </div>
+                )}
                 <div className="kv">
                   <span>{t.cert_link}</span>
                   {link ? (
-                    <a href={link} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${t.cert_link} — ${c.name}`}
+                    >
                       {t.cert_link}
                     </a>
                   ) : (
