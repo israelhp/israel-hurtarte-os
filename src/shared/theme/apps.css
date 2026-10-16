@@ -672,7 +672,7 @@
   font-size: 22px;
   letter-spacing: -0.02em;
 }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .welcome {
     padding: 24px 20px;
   }

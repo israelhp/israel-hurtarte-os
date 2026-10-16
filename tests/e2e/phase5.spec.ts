@@ -260,7 +260,7 @@ test.describe("Portfolio View", () => {
       const overflowing: string[] = [];
       document.querySelectorAll(".pf *").forEach((el) => {
         const b = el.getBoundingClientRect();
-        if (b.width > 0 && b.right > pf.clientWidth + 1)
+        if (b.width > 0 && b.right > pf.clientWidth + 1 && !el.closest(".pf-links"))
           overflowing.push(`${el.tagName}.${el.className}`);
       });
       return {

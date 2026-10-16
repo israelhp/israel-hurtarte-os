@@ -1,0 +1,146 @@
+/* Phase 6 — responsive adjustments beyond the prototype (documented in docs/specs/PORT-RESPONSIVE-001).
+   "Compact" = `(max-width: 760px), (max-height: 500px)`; it mirrors COMPACT_* in the window-manager model. */
+
+/* 1. Menu bar: never wrap its contents. Between the prototype's 1100px and 760px breakpoints it ran out of
+   room on tablets (role text and the Portfolio View button broke into two lines). */
+.logo,
+.tb-role,
+.pv-btn,
+.tb-clock {
+  white-space: nowrap;
+}
+.pv-btn {
+  flex: none;
+}
+@media (max-width: 900px) {
+  .tb-role,
+  .tb-sep {
+    display: none;
+  }
+}
+@media (max-width: 820px) {
+  .tb-clock {
+    display: none;
+  }
+}
+
+/* 2. The title-bar handle fills the whole bar (it was 20px tall, below the 24px WCAG 2.2 target minimum). */
+.wtitle {
+  align-self: stretch;
+}
+
+/* 3. Touch screens: the prototype only enlarges the window buttons at <=760px; tablets are touch too. */
+@media (pointer: coarse) {
+  .light {
+    width: 34px;
+    height: 34px;
+  }
+}
+/* Keep the title centred between the (wider) buttons and an equal spacer. Compact screens already have the
+   prototype's own rules (`.lights{width:auto}`, `.tb-pad{width:0}`), which must not be overridden. */
+@media (pointer: coarse) and (min-width: 761px) and (min-height: 501px) {
+  .lights,
+  .tb-pad {
+    width: 110px;
+  }
+}
+
+/* 4. Links in rows keep a 24px-high target. */
+.link-row a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+/* 5. Hover-only effects must not stick after a tap on devices that cannot hover (not on compact screens,
+   where the prototype shows Dock labels permanently). */
+@media (hover: none) and (min-width: 761px) and (min-height: 501px) {
+  .dock-item:hover,
+  .dock-item:hover + .dock-item,
+  .dock-item:has(+ .dock-item:hover) {
+    transform: none;
+  }
+  .dock-item:hover .dock-tip {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  .tcard:hover,
+  .pcard:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* 6. Notches: with viewport-fit=cover, keep bars and the Dock clear of the safe areas. */
+.topbar {
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(10px, env(safe-area-inset-right));
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .dock {
+    padding-left: calc(6px + env(safe-area-inset-left));
+    padding-right: calc(6px + env(safe-area-inset-right));
+  }
+}
+
+/* 7. Short landscape screens (phones turned sideways): the compact layout alone leaves ~190px for a window.
+   Drop the Dock labels and use the room for the window. */
+@media (max-height: 500px) {
+  .dock-tip {
+    display: none;
+  }
+  .dock {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  }
+  .dock-item {
+    min-width: 52px;
+  }
+  .win,
+  .win.max {
+    left: 0 !important;
+    top: 40px !important;
+    width: 100% !important;
+    height: calc(100% - 40px - 62px) !important;
+  }
+}
+
+/* 8. Portfolio View nav on phones: logo + controls on one row and the section links in one scrollable row,
+   instead of a ~175px tall sticky block. */
+@media (max-width: 760px) {
+  .pf-nav {
+    gap: 8px;
+    padding: 6px 12px;
+  }
+  .pf-links {
+    order: 3;
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* overflow-x:auto also clips vertically: leave room for the 3px focus ring */
+    padding-block: 4px;
+    margin-block: -4px;
+  }
+  .pf-links::-webkit-scrollbar {
+    display: none;
+  }
+  .pf-links a {
+    white-space: nowrap;
+    padding: 8px 10px;
+  }
+  .hero {
+    padding: 40px 0 48px;
+  }
+  .pf-sec {
+    padding: 40px 0;
+    scroll-margin-top: 96px;
+  }
+}
+
+/* On short landscape screens a sticky nav would take a quarter of the height: let it scroll away. */
+@media (max-height: 500px) {
+  .pf-nav {
+    position: static;
+  }
+}

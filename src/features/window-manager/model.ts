@@ -7,7 +7,10 @@ export const DOCK_SPACE = 92; // space reserved for the dock
 export const EDGE = 8;
 export const MIN_W = 280;
 export const MIN_H = 220;
-export const COMPACT_MAX_WIDTH = 760; // at or below this width windows are full-screen (no dragging)
+// Compact screens (phones, and landscape phones where the height is the limit): windows are full-screen and
+// cannot be dragged. Must mirror the `@media (max-width: 760px), (max-height: 500px)` rules in the theme CSS.
+export const COMPACT_MAX_WIDTH = 760;
+export const COMPACT_MAX_HEIGHT = 500;
 /** Renormalize z-indices before they grow without bound. */
 const Z_LIMIT = 5000;
 
@@ -57,7 +60,7 @@ export function initialState(): WmState {
 }
 
 export const isVisible = (w: WinState) => w.open && !w.min;
-export const isCompact = (vp: Viewport) => vp.w <= COMPACT_MAX_WIDTH;
+export const isCompact = (vp: Viewport) => vp.w <= COMPACT_MAX_WIDTH || vp.h <= COMPACT_MAX_HEIGHT;
 
 /** Keep a window fully reachable: inside the viewport, below the menu bar and above the dock. */
 export function clampGeo(g: Geo, vp: Viewport): Geo {

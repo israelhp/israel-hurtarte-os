@@ -12,6 +12,7 @@ import {
   finishMinimize,
   focusWindow,
   initialState,
+  isCompact,
   isVisible,
   moveWindow,
   openWindow,
@@ -204,5 +205,36 @@ describe("reset", () => {
     const s = resetWindows();
     expect(APP_IDS.every((id) => !s.wins[id].open)).toBe(true);
     expect(s.active).toBeNull();
+  });
+});
+
+describe("compact screens (phones, landscape phones)", () => {
+  it("are narrow (<=760) or short (<=500) viewports", () => {
+    expect(isCompact({ w: 760, h: 900 })).toBe(true);
+    expect(isCompact({ w: 390, h: 844 })).toBe(true);
+    expect(isCompact({ w: 844, h: 390 })).toBe(true); // landscape phone
+    expect(isCompact({ w: 1100, h: 500 })).toBe(true);
+    expect(isCompact({ w: 761, h: 501 })).toBe(false);
+    expect(isCompact({ w: 1024, h: 768 })).toBe(false);
+  });
+
+  it("windows cannot be moved while the screen is compact, including a short landscape one", () => {
+    const s = open(initialState(), "home");
+    expect(moveWindow(s, "home", 10, 10, { w: 844, h: 390 })).toBe(s);
+  });
+
+  it("a window placed on a big screen is brought back inside after a smaller screen and again after a bigger one", () => {
+    let s = open(initialState(), "projects");
+    s = moveWindow(s, "projects", 380, 160, VP);
+    const small: Viewport = { w: 900, h: 600 };
+    s = viewportChanged(s, small);
+    let w = s.wins.projects;
+    expect(w.x + w.w).toBeLessThanOrEqual(small.w - EDGE);
+    expect(w.y + w.h).toBeLessThanOrEqual(small.h - DOCK_SPACE);
+    s = viewportChanged(s, VP); // growing again never pushes it out of the new, larger screen
+    w = s.wins.projects;
+    expect(w.x).toBeGreaterThanOrEqual(EDGE);
+    expect(w.x + w.w).toBeLessThanOrEqual(VP.w - EDGE);
+    expect(w.y).toBeGreaterThanOrEqual(TOP + EDGE);
   });
 });

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { LANGS, DICTIONARIES, type Lang } from "@/i18n";
 import { BOOT_SCRIPT } from "@/features/settings/boot-script";
@@ -11,6 +11,15 @@ import "../globals.css";
 
 // Root layout for every localized page. All `/es/*` and `/en/*` pages are pre-rendered at build time.
 export const dynamicParams = false;
+
+// Notch-safe layout and a window that shrinks with the on-screen keyboard (Android Chrome), so the Terminal prompt
+// and the contact form stay visible while typing.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  interactiveWidget: "resizes-content",
+};
 
 export function generateStaticParams() {
   return LANGS.map((lang) => ({ lang }));

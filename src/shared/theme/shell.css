@@ -444,7 +444,7 @@
     display: none;
   }
 }
-@media (max-width: 760px) {
+@media (max-width: 760px), (max-height: 500px) {
   .tb-role,
   .tb-sep,
   .tb-clock {

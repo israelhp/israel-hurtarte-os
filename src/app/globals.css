@@ -6,6 +6,7 @@
 @import "../shared/theme/apps.css";
 @import "../shared/theme/portfolio.css";
 @import "../shared/theme/tour.css";
+@import "../shared/theme/responsive.css";
 @import "../shared/theme/a11y-overrides.css";
 
 @theme inline {

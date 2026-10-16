@@ -56,7 +56,9 @@ export function PortfolioView() {
         <header className="pf-nav">
           <Link href={desktopHref} className="logo">
             <span className="logo-dot" />
-            {SITE.name}
+            <span className="logo-full">{SITE.name}</span>
+            <span className="logo-short">IH.OS</span>
+            <span className="sr-only"> — {t.desktop_mode}</span>
           </Link>
           <nav className="pf-links" aria-label={t.portfolio_nav}>
             {sections.map((s) => (
