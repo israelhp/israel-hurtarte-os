@@ -23,6 +23,7 @@ describe("Person JSON-LD", () => {
     expect(es.sameAs).toEqual([
       "https://github.com/israelhp",
       "https://www.linkedin.com/in/israel-hurtarte-738245218/",
+      "https://israel-hurtarte-os.site",
     ]);
   });
 

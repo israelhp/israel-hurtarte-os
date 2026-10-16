@@ -306,7 +306,10 @@ describe("content integrity", () => {
       else expect(l.href).toBe("");
     }
     expect(socialLinks.find((l) => l.id === "email")?.href).toBe("mailto:israelhurtarte@gmail.com");
-    expect(socialLinks.find((l) => l.id === "website")?.value).toBe("");
+    expect(socialLinks.find((l) => l.id === "website")).toMatchObject({
+      value: "israel-hurtarte-os.site",
+      href: "https://israel-hurtarte-os.site",
+    });
     // the CV is a same-site file or a safe https link (or empty when not configured)
     if (profile.cvUrl)
       expect(safeLocalPath(profile.cvUrl) ?? safeHref(profile.cvUrl)).not.toBeNull();

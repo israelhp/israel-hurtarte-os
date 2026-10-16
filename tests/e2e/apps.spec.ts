@@ -68,7 +68,10 @@ test.describe("About", () => {
       "href",
       /^https:\/\/www\.linkedin\.com\/in\/israel-hurtarte-/,
     );
-    await expect(w.locator(".nc")).toContainText("No configurado");
+    const site = w.getByRole("link", { name: "israel-hurtarte-os.site" });
+    await expect(site).toHaveAttribute("href", "https://israel-hurtarte-os.site");
+    await expect(site).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(w.locator(".nc")).toHaveCount(0); // every contact link is configured now
     if (profile.cvUrl) {
       // a CV shipped with the site is a real download link
       const cv = w.getByRole("link", { name: /Descargar CV/ });

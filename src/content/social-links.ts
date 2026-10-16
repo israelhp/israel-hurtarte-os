@@ -23,7 +23,7 @@ export const socialLinks: SocialLink[] = [
   {
     id: "website",
     label: "Website",
-    value: "",
-    href: "",
+    value: "israel-hurtarte-os.site",
+    href: "https://israel-hurtarte-os.site",
   },
 ];
