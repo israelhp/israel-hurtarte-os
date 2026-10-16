@@ -5,7 +5,11 @@ import { Icon } from "@/shared/icons/Icon";
 import { profile } from "@/content/profile";
 import { socialLinks } from "@/content/social-links";
 import { safeHref } from "@/lib/safe-href";
+import type { Dictionary } from "@/i18n";
 import { useT } from "@/features/settings/hooks";
+
+const linkLabel = (id: string, fallback: string, t: Dictionary) =>
+  id === "email" ? t.form_email : id === "website" ? t.link_website : fallback;
 
 /** Contact links from `src/content/social-links.ts`. Unconfigured entries show "Not configured". */
 export function LinkList({ withLocation }: { withLocation?: boolean }) {
@@ -17,7 +21,7 @@ export function LinkList({ withLocation }: { withLocation?: boolean }) {
         const ok = Boolean(l.value && href);
         const external = ok && !href!.startsWith("mailto:");
         return (
-          <LinkRow key={l.id} label={l.id === "email" ? t.form_email : l.label}>
+          <LinkRow key={l.id} label={linkLabel(l.id, l.label, t)}>
             {ok ? (
               <a
                 href={href!}

@@ -186,6 +186,24 @@ export const skills: Skill[] = [
     },
   },
   {
+    name: "Java / Spring Boot",
+    mono: "Jv",
+    cat: "backend",
+    desc: {
+      en: "JVM language and framework for enterprise backends.",
+      es: "Lenguaje y framework de la JVM para backends empresariales.",
+    },
+  },
+  {
+    name: "C# / .NET Core",
+    mono: "C#",
+    cat: "backend",
+    desc: {
+      en: "Microsoft's managed language and platform for services and APIs.",
+      es: "Lenguaje y plataforma de Microsoft para servicios y APIs.",
+    },
+  },
+  {
     name: "REST APIs",
     mono: "AP",
     cat: "backend",

@@ -33,6 +33,8 @@ export function StackApp() {
       (stackCat === "all" || k.cat === stackCat) &&
       (!q || k.name.toLowerCase().includes(q) || k.desc[lang].toLowerCase().includes(q)),
   );
+  // The prototype wording says "demo projects"; once real projects replace them the neutral wording is used.
+  const hasDemo = projects.some((p) => p.status === "demo");
   const sel = skills.find((k) => k.name === stackSel) ?? null;
   const related = sel ? projects.filter((p) => p.stack.includes(sel.name)) : [];
 
@@ -127,7 +129,7 @@ export function StackApp() {
             </div>
             <p className="dt-p">{categoryDescriptions[sel.cat][lang]}</p>
             <div className="h-eyebrow" style={{ marginBottom: 8 }}>
-              {t.stack_related}
+              {hasDemo ? t.stack_related : t.stack_related_real}
             </div>
             {related.map((p) => (
               <button key={p.id} type="button" className="rel" onClick={() => openProject(p.id)}>
@@ -141,7 +143,7 @@ export function StackApp() {
             ))}
             {related.length === 0 && (
               <p className="muted" style={{ fontSize: 12.5, margin: 0 }}>
-                {t.stack_none}
+                {hasDemo ? t.stack_none : t.stack_none_real}
               </p>
             )}
           </>

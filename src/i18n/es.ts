@@ -152,6 +152,9 @@ export const es = {
   meta_desc_portfolio:
     "Vista de portafolio de Israel Hurtarte, Desarrollador Full Stack en Guatemala: perfil, tecnolog\u00edas, proyectos, experiencia, educaci\u00f3n y contacto.",
   portfolio_nav: "Secciones del portafolio",
+  link_website: "Sitio web",
+  stack_related_real: "Proyectos relacionados",
+  stack_none_real: "Aún no hay proyectos relacionados.",
 } as const;
 
 export type Dictionary = { [K in keyof typeof es]: string };

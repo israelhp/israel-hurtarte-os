@@ -125,7 +125,7 @@ export function PortfolioView() {
                 </div>
                 <SectionCard title={t.about_spec} headingLevel={3}>
                   <Chips>
-                    {profile.specialties.map((s) => (
+                    {profile.specialties[lang].map((s) => (
                       <Chip key={s}>{s}</Chip>
                     ))}
                   </Chips>
@@ -158,7 +158,8 @@ export function PortfolioView() {
             <section className="pf-sec" id="p-projects" aria-labelledby="h-projects">
               <div className="h-eyebrow">{eyebrow(3, t.app_projects)}</div>
               <h2 id="h-projects">
-                {t.w_projects} <DemoTag>DEMO</DemoTag>
+                {t.w_projects}{" "}
+                {projects.some((p) => p.status === "demo") && <DemoTag>DEMO</DemoTag>}
               </h2>
               <div className="pgrid">
                 {projects.map((p) => (

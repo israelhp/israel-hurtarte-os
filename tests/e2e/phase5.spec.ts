@@ -1,4 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
+import { findPhoneLike, REFERENCE_WORDS } from "../../src/lib/pii";
+import {
+  certifications,
+  demoProjects,
+  education,
+  experience,
+  placeholderCerts,
+  projects,
+  skills,
+} from "./content";
 import { expect, test, type Page } from "@playwright/test";
 
 const win = (p: Page, id: string) => p.locator(`[data-win="${id}"]`);
@@ -182,15 +192,16 @@ test.describe("Portfolio View", () => {
       "Construyamos algo juntos.",
     ])
       await expect(page.getByRole("heading", { name: h, level: 2 })).toBeVisible();
-    await expect(page.locator("#p-skills .chip")).toHaveCount(29);
-    await expect(page.locator("#p-projects .pcard")).toHaveCount(5);
-    await expect(page.locator("#p-projects h2 .demo-tag")).toHaveText("DEMO");
-    await expect(page.locator("#p-experience .tl-item")).toHaveCount(3);
+    await expect(page.locator("#p-skills .chip")).toHaveCount(skills.length);
+    await expect(page.locator("#p-projects .pcard")).toHaveCount(projects.length);
+    await expect(page.locator("#p-projects h2 .demo-tag")).toHaveCount(demoProjects.length ? 1 : 0);
+    await expect(page.locator("#p-experience .tl-item")).toHaveCount(experience.length);
     await expect(page.locator("#p-experience")).toContainText(
       "Banco G&T Continental · Marzo 2024 – Actualidad",
     );
-    await expect(page.locator("#p-certs .demo-tag")).toHaveCount(4);
-    await expect(page.locator("#p-education .ecard")).toHaveCount(3);
+    await expect(page.locator("#p-certs .ecard")).toHaveCount(certifications.length);
+    await expect(page.locator("#p-certs .demo-tag")).toHaveCount(placeholderCerts.length);
+    await expect(page.locator("#p-education .ecard")).toHaveCount(education.length);
     await expect(page.getByRole("link", { name: "israelhurtarte@gmail.com" })).toHaveAttribute(
       "href",
       "mailto:israelhurtarte@gmail.com",
@@ -220,10 +231,11 @@ test.describe("Portfolio View", () => {
     page,
   }) => {
     await page.goto("/es/portfolio");
-    await page.getByRole("button", { name: /Ver detalles — Enterprise API/ }).click();
+    const target = projects[projects.length - 1]; // any project works; the last one proves the right one opens
+    await page.getByRole("button", { name: new RegExp(`Ver detalles — ${target.name}`) }).click();
     await expect(page).toHaveURL(/\/es$/);
     await expect(
-      win(page, "projects").getByRole("heading", { level: 2, name: "Enterprise API" }),
+      win(page, "projects").getByRole("heading", { level: 2, name: target.name }),
     ).toBeVisible();
     await expect(win(page, "home")).toHaveCount(0); // desktop does not pile a Welcome window on top
     await page.getByRole("link", { name: "Vista portafolio" }).first().click();
@@ -474,6 +486,51 @@ test.describe("Guided tour", () => {
               .join(" | ")}`,
         ),
       ).toEqual([]);
+    });
+  }
+});
+
+test.describe("privacy", () => {
+  // The owner's CV contains a phone number and references with phone numbers. None of that may reach the site.
+  // Heuristic: no phone-shaped digit runs in visible text, link targets or meta content, and no reference headings.
+  const ROUTES = ["/es", "/en", "/es/portfolio", "/en/portfolio"];
+
+  for (const route of ROUTES) {
+    test(`no phone-like numbers or reference headings are rendered on ${route}`, async ({
+      page,
+    }) => {
+      await skipTour(page);
+      await page.goto(route);
+      if (!route.endsWith("portfolio")) {
+        await expect(win(page, "home")).toBeVisible();
+        // open every window so all app content is in the DOM
+        for (const id of [
+          "about",
+          "stack",
+          "projects",
+          "experience",
+          "education",
+          "certs",
+          "terminal",
+          "contact",
+        ])
+          await page.locator(`[data-dock-app="${id}"]`).click();
+      }
+      const text = await page.evaluate(() => {
+        const attrs = [
+          ...document.querySelectorAll("a[href], [title], [aria-label], meta[content]"),
+        ].map((el) =>
+          ["href", "title", "aria-label", "content"]
+            .map((a) => el.getAttribute(a) ?? "")
+            .join("\n"),
+        );
+        return [document.body.innerText, document.title, ...attrs].join("\n");
+      });
+      expect(findPhoneLike(text), "phone-like number rendered").toEqual([]);
+      expect(text).not.toMatch(REFERENCE_WORDS);
+      await expect(
+        page.locator('a[href^="tel:"], a[href*="wa.me"], a[href*="whatsapp"]'),
+      ).toHaveCount(0);
     });
   }
 });

@@ -71,7 +71,9 @@ export function CertsApp() {
           );
         })}
       </div>
-      <Note className="mt-4">{t.cert_note}</Note>
+      {certifications.some((c) => c.status === "placeholder") && (
+        <Note className="mt-4">{t.cert_note}</Note>
+      )}
     </div>
   );
 }

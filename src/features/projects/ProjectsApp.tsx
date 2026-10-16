@@ -60,6 +60,7 @@ export function ProjectsApp() {
   const { projectFilter, projectSel, setProjectFilter, setProjectSel } = useApps();
   const folderLabel = (f: ProjectFilter) => t[`f_${f}` as const];
   const items = projects.filter((p) => projectFilter === "all" || p.tags.includes(projectFilter));
+  const hasDemo = projects.some((p) => p.status === "demo");
   const sel = projects.find((p) => p.id === projectSel) ?? null;
 
   return (
@@ -86,7 +87,7 @@ export function ProjectsApp() {
               <div className="crumb">
                 {t.app_projects} / <b>{folderLabel(projectFilter)}</b>
               </div>
-              <DemoTag>DEMO DATA</DemoTag>
+              {hasDemo && <DemoTag>DEMO DATA</DemoTag>}
             </div>
             <div className="pgrid">
               {items.map((p, i) => (
@@ -124,7 +125,7 @@ export function ProjectsApp() {
               ))}
             </div>
             {items.length === 0 && <div className="empty">{t.proj_empty}</div>}
-            <Note className="mt-4">{t.demo_note}</Note>
+            {hasDemo && <Note className="mt-4">{t.demo_note}</Note>}
           </>
         ) : (
           <div className="pd">

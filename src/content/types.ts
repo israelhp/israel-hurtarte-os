@@ -17,7 +17,7 @@ export type Profile = {
   location: string;
   tagline: Localized<string>;
   bio: Localized<string>;
-  specialties: string[];
+  specialties: Localized<string[]>;
   /** Empty string = not configured (the UI shows "Not configured"). */
   cvUrl: string;
 };

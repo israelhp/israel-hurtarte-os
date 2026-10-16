@@ -35,7 +35,7 @@ export function AboutApp() {
       <div className="grid2">
         <SectionCard title={t.about_spec} headingLevel={3}>
           <Chips>
-            {profile.specialties.map((s) => (
+            {profile.specialties[lang].map((s) => (
               <Chip key={s}>{s}</Chip>
             ))}
           </Chips>

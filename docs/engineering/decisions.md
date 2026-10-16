@@ -8,6 +8,15 @@
 - D4 Demo projects and placeholder certifications stay visible with their DEMO/PLACEHOLDER labels until replaced.
 - D5 Contact via `mailto:`. D6 Solid background instead of blur at <=760px. D7 All 12 agents. D8 Zustand (acceptable if everything works correctly). D9 "Prototype/DEMO" copy kept as is. D10 Missing data (CV, website, screenshots, domain) added later by the owner.
 
+## Pending owner decisions (Phase 7, from the CV)
+
+- D11 Publish your phone number? Default: **no** (spam/scraping). It would be a `tel:`/WhatsApp link, never plain text in a public page.
+- D12 CV download: give me a public PDF without phone and references, or authorize me to generate one from the site content.
+- D13 Confirm the ◐ items (docs/content/cv-reconciliation.md): content on the site that the CV does not mention (SQL/reporting/dashboards, REST API work, Angular/Ionic/Cordova/Postman…, the whole VisionBitt entry). Nothing was removed.
+- D14 Bio: keep the current passion-based bio, or replace/merge with the CV summary ("4 años de experiencia … banca empresarial y tarjetas de crédito … ACH").
+- D15 Soft skills from the CV: add a small card (new UI, not in the prototype) or omit.
+- D16 Languages: the CV lists only Spanish; add an "Idiomas" line (with English level?) or omit. Nothing about language level is claimed today.
+
 ## Technical decisions
 
 - T1 Scaffold from `create-next-app` 16.4.2 (Tailwind 4 via `@tailwindcss/turbopack`, ESLint 9). Dropped scaffold's `cacheComponents`, `partialPrefetching`, React Compiler: incompatible/unneeded with `output: "export"`.
@@ -24,6 +33,9 @@
 
 - T10 `npm run typecheck` runs `next typegen` first: route helper types (`PageProps`, `LayoutProps`) are generated, so a clean checkout (CI) would otherwise fail `tsc`. Found by checking from a deleted `.next`.
 - T11 Language comes from the URL (React context), preferences from storage; theme/accent are `html` attributes set by an inline boot script (details in docs/specs/PHASE-5-NOTES.md).
+
+- T12 Demo/placeholder notices are rendered only while such items exist, and e2e counts/names derive from `src/content` (checked by swapping content). See docs/content/EDITING.md.
+- T13 Privacy guard (`src/lib/pii.ts`): tests fail if phone-shaped numbers, `tel:`/WhatsApp links or "references" headings appear in content or rendered pages. It is a heuristic and cannot detect names; the CV (owner's phone, four third-party references) is never copied into the repo.
 
 ## Accepted risks
 

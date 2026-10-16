@@ -1,5 +1,19 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import {
+  certifications,
+  certsIn,
+  demoProjects,
+  education,
+  experience,
+  profile,
+  placeholderCerts,
+  projectUsing,
+  projects,
+  projectsIn,
+  skills,
+  skillsIn,
+} from "./content";
 
 const win = (p: Page, id: string) => p.locator(`[data-win="${id}"]`);
 const openApp = async (p: Page, id: string) => {
@@ -34,7 +48,10 @@ test.describe("About", () => {
   test("renders real profile data, safe links and an honest CV state", async ({ page }) => {
     const w = await openApp(page, "about");
     await expect(w.getByRole("heading", { name: "Israel Hurtarte" })).toBeVisible();
-    await expect(w.locator(".chips .chip")).toHaveCount(10);
+    await expect(w.locator(".chips .chip")).toHaveCount(profile.specialties.es.length);
+    // specialties follow the language (no English labels in the Spanish view)
+    await expect(w).toContainText("Desarrollo de APIs REST");
+    await expect(w).not.toContainText("REST API Development");
     await expect(w.getByRole("link", { name: "israelhurtarte@gmail.com" })).toHaveAttribute(
       "href",
       "mailto:israelhurtarte@gmail.com",
@@ -54,9 +71,9 @@ test.describe("About", () => {
 test.describe("Tech Stack", () => {
   test("filters by category, searches, and shows an empty state", async ({ page }) => {
     const w = await openApp(page, "stack");
-    await expect(w.locator(".tcard")).toHaveCount(29);
+    await expect(w.locator(".tcard")).toHaveCount(skills.length);
     await w.getByRole("button", { name: /^Frontend/ }).click();
-    await expect(w.locator(".tcard")).toHaveCount(9);
+    await expect(w.locator(".tcard")).toHaveCount(skillsIn("frontend").length);
     await w.getByRole("button", { name: /^Todas/ }).click();
     await w.getByRole("textbox", { name: "Buscar tecnologías…" }).fill("postgresql");
     await expect(w.locator(".tcard")).toHaveCount(1);
@@ -65,43 +82,66 @@ test.describe("Tech Stack", () => {
     await expect(w.getByText("Ninguna tecnología coincide con tu búsqueda.")).toBeVisible();
   });
 
-  test("detail pane links related demo projects and opens them in Projects", async ({
-    page,
-  }, info) => {
+  test("detail pane links related projects and opens them in Projects", async ({ page }, info) => {
     test.skip(info.project.name === "mobile", "detail pane is a bottom sheet on compact screens");
+    // pick a technology that the first project really uses, so the test follows the content
+    const tech = projects[0].stack[0];
+    const related = projectUsing(tech)!;
     const w = await openApp(page, "stack");
-    await w.locator(".tcard", { hasText: "Node.js" }).first().click();
-    await expect(w.locator(".detail")).toContainText("Enterprise API");
-    await w.getByRole("button", { name: /Enterprise API/ }).click();
-    const projects = win(page, "projects");
-    await expect(projects).toBeVisible();
-    await expect(projects.getByRole("heading", { name: "Enterprise API", level: 2 })).toBeVisible();
+    await w
+      .locator(".tcard")
+      .filter({
+        has: page.locator(".tc-name", {
+          // relative to each card
+          hasText: new RegExp(`^${tech.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}$`),
+        }),
+      })
+      .click();
+    await expect(w.locator(".detail")).toContainText(related.name);
+    await w.getByRole("button", { name: new RegExp(related.name) }).click();
+    const projectsWin = win(page, "projects");
+    await expect(projectsWin).toBeVisible();
+    await expect(projectsWin.getByRole("heading", { name: related.name, level: 2 })).toBeVisible();
   });
 });
 
 test.describe("Projects", () => {
-  test("lists demo projects with DEMO labels and filters by folder", async ({ page }) => {
+  test("lists the projects, labels demo ones and filters by folder", async ({ page }) => {
+    expect(projects.length, "the portfolio needs at least one project").toBeGreaterThan(0);
     const w = await openApp(page, "projects");
-    await expect(w.locator(".pcard")).toHaveCount(5);
-    await expect(w.locator(".pcard .demo-tag")).toHaveCount(5);
-    await expect(w.locator(".toolbar .demo-tag")).toHaveText("DEMO DATA");
+    await expect(w.locator(".pcard")).toHaveCount(projects.length);
+    await expect(w.locator(".pcard .demo-tag")).toHaveCount(demoProjects.length);
+    // the "DEMO DATA" banner only exists while demo projects do
+    await expect(w.locator(".toolbar .demo-tag")).toHaveCount(demoProjects.length ? 1 : 0);
+    const featured = projectsIn("featured");
     await w.getByRole("button", { name: /^Destacados/ }).click();
-    await expect(w.locator(".pcard")).toHaveCount(3);
+    await expect(w.locator(".pcard")).toHaveCount(featured.length);
+    const mobile = projectsIn("mobile");
     await w.getByRole("button", { name: /^Móvil/ }).click();
-    await expect(w.locator(".pcard")).toHaveCount(1);
-    await expect(w.locator(".pcard")).toContainText("Fitness Tracker");
+    await expect(w.locator(".pcard")).toHaveCount(mobile.length);
+    if (mobile.length) await expect(w.locator(".pcard").first()).toContainText(mobile[0].name);
+    else await expect(w.getByText("Aún no hay proyectos en esta carpeta.")).toBeVisible();
   });
 
-  test("detail view shows every section, no invented links, and goes back", async ({ page }) => {
+  test("detail view shows every section, only real links, and goes back", async ({ page }) => {
+    const first = projects[0];
     const w = await openApp(page, "projects");
-    await w.getByRole("button", { name: /Ver detalles — Commerce Dashboard/ }).click();
+    await w.getByRole("button", { name: new RegExp(`Ver detalles — ${first.name}`) }).click();
     for (const h of ["Objetivo", "Stack", "Funcionalidades", "Arquitectura", "Desafíos técnicos"])
       await expect(w.getByRole("heading", { name: h })).toBeVisible();
-    await expect(w.locator(".arch")).toContainText("PostgreSQL");
-    await expect(w.getByText("No hay demo ni repositorio público configurado.")).toBeVisible();
-    await expect(w.locator("a[href]")).toHaveCount(0);
+    await expect(w.locator(".arch")).toContainText(first.arch.trim().split(/\s+/)[0]);
+    const links = [first.demoUrl, first.repoUrl].filter(Boolean);
+    if (links.length === 0) {
+      await expect(w.getByText("No hay demo ni repositorio público configurado.")).toBeVisible();
+      await expect(w.locator("a[href]")).toHaveCount(0);
+    } else {
+      // every configured URL is rendered as a safe external link, and nothing else is
+      await expect(w.locator("a[href]")).toHaveCount(links.length);
+      for (const url of links)
+        await expect(w.locator(`a[href="${url}"]`)).toHaveAttribute("rel", "noopener noreferrer");
+    }
     await w.getByRole("button", { name: "Volver a proyectos" }).click();
-    await expect(w.locator(".pcard")).toHaveCount(5);
+    await expect(w.locator(".pcard")).toHaveCount(projects.length);
   });
 });
 
@@ -116,7 +156,7 @@ test.describe("Experience", () => {
     await expect(w).toContainText("Marzo 2021 – Marzo 2024");
     await expect(w).toContainText("VisionBitt · Enero 2025 – Actualidad");
     const toggles = w.locator(".tl-head");
-    await expect(toggles).toHaveCount(3);
+    await expect(toggles).toHaveCount(experience.length);
     await expect(toggles.nth(0)).toHaveAttribute("aria-expanded", "true");
     await expect(w.getByText("Responsabilidades")).toHaveCount(1);
     await toggles.nth(1).click();
@@ -131,21 +171,26 @@ test.describe("Experience", () => {
 test.describe("Education and Certifications", () => {
   test("education lists the three real entries", async ({ page }) => {
     const w = await openApp(page, "education");
-    await expect(w.locator(".ecard")).toHaveCount(3);
+    await expect(w.locator(".ecard")).toHaveCount(education.length);
     await expect(w).toContainText("Maestría en Seguridad Informática");
     await expect(w).toContainText("Ingeniería en Sistemas");
     await expect(w).toContainText("Colegio Verbo No. 4");
   });
 
-  test("certifications are clearly placeholders and filterable", async ({ page }) => {
+  test("certifications: placeholders are labelled, real ones are not, and the filter works", async ({
+    page,
+  }) => {
     const w = await openApp(page, "certs");
-    await expect(w.locator(".ecard")).toHaveCount(4);
-    await expect(w.locator(".demo-tag")).toHaveCount(4);
-    await expect(w.locator(".demo-tag").first()).toHaveText("PLACEHOLDER");
+    await expect(w.locator(".ecard")).toHaveCount(certifications.length);
+    await expect(w.locator(".demo-tag")).toHaveCount(placeholderCerts.length);
+    if (placeholderCerts.length)
+      await expect(w.locator(".demo-tag").first()).toHaveText("PLACEHOLDER");
+    const cloud = certsIn("cloud");
     await w.getByRole("button", { name: "Nube" }).click();
-    await expect(w.locator(".ecard")).toHaveCount(1);
+    await expect(w.locator(".ecard")).toHaveCount(cloud.length);
     await expect(w.getByRole("button", { name: "Nube" })).toHaveAttribute("aria-pressed", "true");
-    await expect(w.locator("a[href]")).toHaveCount(0);
+    const withLink = cloud.filter((c) => c.link).length;
+    await expect(w.locator(".ecard a[href]")).toHaveCount(withLink);
   });
 });
 
@@ -346,17 +391,31 @@ test("compact screens: app windows fit without horizontal scroll", async ({ page
 });
 
 test("terminal welcome line is typed with real motion and ends up in the log", async ({ page }) => {
+  // The welcome line is typed with a 16ms interval (~1s). Stretch only that interval so the test cannot
+  // miss the animation when the machine is busy; nothing else in the page is affected.
+  await page.addInitScript(() => {
+    const original = window.setInterval.bind(window);
+    window.setInterval = ((fn: TimerHandler, ms?: number, ...args: unknown[]) =>
+      original(fn, ms === 16 ? 160 : ms, ...args)) as typeof window.setInterval;
+  });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/es");
   const w = await openApp(page, "terminal");
   const log = w.getByRole("log", { name: "Salida de la terminal" });
   // while typing, the partial text lives outside the live region
   await expect(w.locator(".tline[aria-hidden='true']")).toBeVisible();
-  await expect(log).toContainText("Terminal v1.0", { timeout: 5000 });
+  await expect(log).toContainText("Terminal v1.0", { timeout: 20_000 });
   await expect(w.locator(".tline[aria-hidden='true']")).toHaveCount(0);
 });
 
 test("closing the terminal mid-typing keeps the full welcome line", async ({ page }) => {
+  // The welcome line is typed with a 16ms interval (~1s). Stretch only that interval so the test cannot
+  // miss the animation when the machine is busy; nothing else in the page is affected.
+  await page.addInitScript(() => {
+    const original = window.setInterval.bind(window);
+    window.setInterval = ((fn: TimerHandler, ms?: number, ...args: unknown[]) =>
+      original(fn, ms === 16 ? 160 : ms, ...args)) as typeof window.setInterval;
+  });
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/es");
   const w = await openApp(page, "terminal");

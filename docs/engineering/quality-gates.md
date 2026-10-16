@@ -15,15 +15,15 @@ Status values: `PASS` · `FAIL` · `NOT_VERIFIED` · `NOT_APPLICABLE` · `NEEDS_
 | CI_BUILD_GATE        | typecheck, lint, unit, build, e2e green in GitHub Actions                                       | CI run                               |
 | RELEASE_GATE         | All above PASS, changelog, rollback notes, owner approval                                       | `/prepare-release`                   |
 
-## Current status (after Phase 6: responsive)
+## Current status (after Phase 7: content)
 
-| Gate                        | Status                                                                                                                                                        | Note                                                                                |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| DESIGN_FIDELITY_GATE        | PASS (tokens) / NEEDS_MANUAL_REVIEW (shell, apps, tour, portfolio, responsive)                                                                                | token test vs original bundle; dark screenshots reviewed by eye, no pixel diff      |
-| FUNCTIONAL_GATE             | PASS                                                                                                                                                          | 116 unit tests + 150 e2e (desktop + mobile projects + the 23-test responsive suite) |
-| WINDOW_MANAGER_GATE         | PASS (mouse, keyboard, emulated touch drag) / NOT_VERIFIED (real devices)                                                                                     |                                                                                     |
-| ACCESSIBILITY_GATE          | PASS (axe: catalog, shell, settings, 9 apps, portfolio, tour; target-size check at 6 viewports) / NOT_VERIFIED (screen reader, manual keyboard, real devices) |                                                                                     |
-| I18N_GATE                   | PASS                                                                                                                                                          | routes `/es` `/en`, default Spanish                                                 |
-| SECURITY_GATE               | NOT_VERIFIED (full audit Phase 8)                                                                                                                             | `audit:prod` clean                                                                  |
-| SEO_GATE / PERFORMANCE_GATE | NOT_VERIFIED                                                                                                                                                  | Phase 8                                                                             |
-| CI_BUILD_GATE               | PASS (local, clean build)                                                                                                                                     | Actions not yet run (no remote)                                                     |
+| Gate                        | Status                                                                                 | Note                                                           |
+| --------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| DESIGN_FIDELITY_GATE        | PASS (tokens) / NEEDS_MANUAL_REVIEW (rest)                                             | dark screenshots reviewed by eye, no pixel diff                |
+| FUNCTIONAL_GATE             | PASS                                                                                   | 150 unit tests + 158 e2e (desktop + mobile + responsive suite) |
+| WINDOW_MANAGER_GATE         | PASS (mouse, keyboard, emulated touch) / NOT_VERIFIED (real devices)                   |                                                                |
+| ACCESSIBILITY_GATE          | PASS (axe + target size) / NOT_VERIFIED (screen reader, manual keyboard, real devices) |                                                                |
+| I18N_GATE                   | PASS                                                                                   | specialties now localized                                      |
+| SECURITY_GATE               | NOT_VERIFIED (full audit Phase 8)                                                      | privacy guard (no phones/references) PASS                      |
+| SEO_GATE / PERFORMANCE_GATE | NOT_VERIFIED                                                                           | Phase 8                                                        |
+| CI_BUILD_GATE               | PASS (local, clean build)                                                              | Actions not yet run (no remote)                                |

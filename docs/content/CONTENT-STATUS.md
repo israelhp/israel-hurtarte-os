@@ -1,0 +1,15 @@
+# Content status (2026-10-16)
+
+| Area                                                 | Status                               | What is pending                                                                                                  |
+| ---------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| Profile (name, role, tagline, bio, 13 specialties)   | verified                             | bio vs CV summary (D14)                                                                                          |
+| Links: email, GitHub, LinkedIn                       | verified                             | —                                                                                                                |
+| Links: website                                       | not configured                       | URL                                                                                                              |
+| CV download                                          | not configured                       | public PDF without phone/references (D12)                                                                        |
+| Phone                                                | not published                        | decision (D11)                                                                                                   |
+| Tech Stack (31)                                      | verified (29 owner list + 2 from CV) | —                                                                                                                |
+| Experience: Banco G&T Junior + Mid-Level, VisionBitt | verified (dates/roles in CV)         | items marked ◐ in cv-reconciliation.md need confirmation (D13)                                                   |
+| Education (3)                                        | verified (matches CV)                | —                                                                                                                |
+| Projects (5)                                         | **demo**, no URLs                    | real projects, URLs, optional screenshots                                                                        |
+| Certifications (4)                                   | **placeholder**                      | real certifications (the CV lists none; "Certificación ICG" is a project achievement, not a personal credential) |
+| Soft skills / languages                              | not shown                            | decisions D15, D16                                                                                               |

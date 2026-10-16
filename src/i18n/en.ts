@@ -153,4 +153,7 @@ export const en: Dictionary = {
   meta_desc_portfolio:
     "Portfolio view of Israel Hurtarte, Full Stack Developer in Guatemala: profile, tech stack, projects, experience, education and contact.",
   portfolio_nav: "Portfolio sections",
+  link_website: "Website",
+  stack_related_real: "Related projects",
+  stack_none_real: "No related projects yet.",
 };
