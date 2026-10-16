@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "agent": "portfolio-engineering-orchestrator",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm run test)",
+      "Bash(npm run test:e2e*)",
+      "Bash(npm run build)",
+      "Bash(npm run check)",
+      "Bash(npm run format*)",
+      "Bash(npm run audit:prod)",
+      "Bash(npx playwright test*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(git switch*)",
+      "Bash(git checkout -b*)",
+      "Bash(git add*)"
+    ],
+    "ask": ["Bash(git commit*)", "Bash(git push*)", "Bash(npm install*)", "Bash(npx*)"],
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(sudo*)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(vercel*--prod*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Edit(./design/source/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-paths.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.mjs\"" }
+        ]
+      }
+    ]
+  }
+}
