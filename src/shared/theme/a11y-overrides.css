@@ -1,0 +1,25 @@
+/* Accessibility deviations from the prototype (documented in docs/specs/DS-001/design-reference.md).
+   tokens.css stays identical to the prototype; every intentional difference lives here.
+
+   1. White text on the prototype's blue/purple/pink/red accents measures 3.4–4.1:1 (< 4.5:1, WCAG 2.2 AA).
+      The fill used behind white text is darkened by 15%; the accent itself is unchanged elsewhere.
+   2. Light accents (orange, green, graphite) fail with white text (2.0–3.3:1): they keep their fill and use black text.
+   3. Links used the raw accent (yellow on a light surface ≈ 1.5:1). They now reuse the prototype's own
+      --ink-p/--ink-b text-on-tint mixing, which is a no-op in dark mode. */
+.os {
+  --acc-fill: color-mix(in srgb, var(--acc) 85%, #000);
+  --link: color-mix(in srgb, var(--acc) var(--ink-p), var(--ink-b));
+}
+.os.acc-orange,
+.os.acc-green,
+.os.acc-graphite {
+  --acc-on: #000;
+  --acc-fill: var(--acc);
+}
+.os.acc-yellow {
+  --acc-fill: var(--acc);
+}
+.btn.primary,
+.fbtn.on {
+  background: var(--acc-fill);
+}

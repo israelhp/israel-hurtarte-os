@@ -1,0 +1,154 @@
+/* Design tokens — copied verbatim from the Claude Design prototype (template lines 119–149).
+   Do not retune values: DS-001 tests compare them against design/source. */
+.os {
+  color: var(--label);
+  background: var(--desk);
+  --acc: var(--blue);
+  --acc-on: #fff;
+  --link: var(--acc);
+  --acc-soft: color-mix(in srgb, var(--acc) 16%, transparent);
+  transition: background 0.3s;
+}
+.os.theme-dark {
+  color-scheme: dark;
+  --blue: #0a84ff;
+  --purple: #bf5af2;
+  --pink: #ff375f;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+  --yellow: #ffd60a;
+  --green: #30d158;
+  --mint: #63e6e2;
+  --teal: #40c8e0;
+  --cyan: #64d2ff;
+  --indigo: #5e5ce6;
+  --brown: #ac8e68;
+  --gray: #98989d;
+  --label: rgba(255, 255, 255, 0.85);
+  --label2: rgba(255, 255, 255, 0.6);
+  --label3: rgba(255, 255, 255, 0.4);
+  --sep: rgba(255, 255, 255, 0.1);
+  --sep2: rgba(255, 255, 255, 0.16);
+  --win: rgba(30, 30, 30, 0.84);
+  --win-bd: rgba(255, 255, 255, 0.13);
+  --title: rgba(58, 58, 60, 0.5);
+  --side: rgba(44, 44, 46, 0.5);
+  --sheet: #28282a;
+  --card: rgba(255, 255, 255, 0.045);
+  --card-h: rgba(255, 255, 255, 0.08);
+  --code: #1c1c1e;
+  --fill: rgba(118, 118, 128, 0.24);
+  --fill2: rgba(118, 118, 128, 0.16);
+  --input: rgba(0, 0, 0, 0.22);
+  --btn: rgba(255, 255, 255, 0.1);
+  --btn-h: rgba(255, 255, 255, 0.16);
+  --seg-on: #636366;
+  --menubar: rgba(22, 22, 24, 0.42);
+  --dock: rgba(46, 46, 48, 0.38);
+  --dock-bd: rgba(255, 255, 255, 0.16);
+  --pop: rgba(40, 40, 42, 0.86);
+  --shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.75), 0 0 0 0.5px rgba(0, 0, 0, 0.85);
+  --light-off: #4d4d4f;
+  --ink-p: 100%;
+  --ink-b: #fff;
+  --sc-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  --steel: #8fa9c4;
+  --tile-top: rgba(255, 255, 255, 0.16);
+  --tile-bot: rgba(255, 255, 255, 0.04);
+  --tile-bd: rgba(255, 255, 255, 0.14);
+  --tile-hi: rgba(255, 255, 255, 0.2);
+  --glyph-p: 100%;
+  --desk:
+    radial-gradient(70% 60% at 18% 12%, rgba(10, 132, 255, 0.38), transparent 62%),
+    radial-gradient(60% 60% at 88% 82%, rgba(64, 200, 224, 0.26), transparent 60%),
+    radial-gradient(45% 45% at 72% 18%, rgba(94, 92, 230, 0.3), transparent 60%),
+    radial-gradient(40% 40% at 25% 90%, rgba(143, 169, 196, 0.16), transparent 60%),
+    linear-gradient(165deg, #0c1424, #05070c);
+}
+/* Aqua (Light) */
+.os.theme-light {
+  color-scheme: light;
+  --blue: #007aff;
+  --purple: #af52de;
+  --pink: #ff2d55;
+  --red: #ff3b30;
+  --orange: #ff9500;
+  --yellow: #ffcc00;
+  --green: #34c759;
+  --mint: #00c7be;
+  --teal: #30b0c7;
+  --cyan: #32ade6;
+  --indigo: #5856d6;
+  --brown: #a2845e;
+  --gray: #8e8e93;
+  --label: rgba(0, 0, 0, 0.85);
+  --label2: rgba(0, 0, 0, 0.6);
+  --label3: rgba(0, 0, 0, 0.4);
+  --sep: rgba(0, 0, 0, 0.1);
+  --sep2: rgba(0, 0, 0, 0.15);
+  --win: rgba(255, 255, 255, 0.84);
+  --win-bd: rgba(0, 0, 0, 0.14);
+  --title: rgba(236, 236, 236, 0.65);
+  --side: rgba(234, 234, 236, 0.55);
+  --sheet: #ffffff;
+  --card: rgba(0, 0, 0, 0.025);
+  --card-h: rgba(0, 0, 0, 0.05);
+  --code: #f5f5f7;
+  --fill: rgba(120, 120, 128, 0.16);
+  --fill2: rgba(120, 120, 128, 0.1);
+  --input: #ffffff;
+  --btn: #ffffff;
+  --btn-h: #f5f5f7;
+  --seg-on: #ffffff;
+  --menubar: rgba(244, 246, 249, 0.55);
+  --dock: rgba(236, 240, 245, 0.42);
+  --dock-bd: rgba(255, 255, 255, 0.6);
+  --pop: rgba(246, 246, 246, 0.9);
+  --shadow: 0 30px 70px -22px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+  --light-off: #dcdcdc;
+  --ink-p: 62%;
+  --ink-b: #000;
+  --sc-shadow: none;
+  --steel: #4f6d8c;
+  --tile-top: rgba(255, 255, 255, 0.92);
+  --tile-bot: rgba(255, 255, 255, 0.6);
+  --tile-bd: rgba(0, 0, 0, 0.09);
+  --tile-hi: rgba(255, 255, 255, 1);
+  --glyph-p: 82%;
+  --desk:
+    radial-gradient(70% 60% at 15% 10%, rgba(0, 122, 255, 0.22), transparent 60%),
+    radial-gradient(60% 55% at 90% 85%, rgba(42, 74, 110, 0.34), transparent 62%),
+    radial-gradient(45% 45% at 75% 15%, rgba(48, 176, 199, 0.16), transparent 60%),
+    radial-gradient(50% 45% at 20% 95%, rgba(79, 109, 140, 0.24), transparent 62%),
+    linear-gradient(165deg, #e4e9ef, #c9d2dc);
+}
+/* macOS accent colors */
+.os.acc-blue {
+  --acc: var(--blue);
+}
+.os.acc-purple {
+  --acc: var(--purple);
+}
+.os.acc-pink {
+  --acc: var(--pink);
+}
+.os.acc-red {
+  --acc: var(--red);
+}
+.os.acc-orange {
+  --acc: var(--orange);
+}
+.os.acc-yellow {
+  --acc: var(--yellow);
+  --acc-on: #000;
+}
+.os.acc-green {
+  --acc: var(--green);
+}
+.os.acc-graphite {
+  --acc: var(--gray);
+}
+.os.theme-light.acc-yellow .btn.primary,
+.os.theme-light.acc-yellow .fbtn.on {
+  color: #000;
+}

@@ -1,14 +1,10 @@
 @import "tailwindcss";
+@import "../shared/theme/tokens.css";
+@import "../shared/theme/base.css";
+@import "../shared/theme/components.css";
+@import "../shared/theme/a11y-overrides.css";
 
-/* Design tokens from the Claude Design prototype land here in Phase 2 (DS-01). */
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-body {
-  margin: 0;
-  background: #000;
-  color: #fff;
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }

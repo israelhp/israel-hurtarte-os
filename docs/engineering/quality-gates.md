@@ -15,9 +15,12 @@ Status values: `PASS` · `FAIL` · `NOT_VERIFIED` · `NOT_APPLICABLE` · `NEEDS_
 | CI_BUILD_GATE        | typecheck, lint, unit, build, e2e green in GitHub Actions                                       | CI run                               |
 | RELEASE_GATE         | All above PASS, changelog, rollback notes, owner approval                                       | `/prepare-release`                   |
 
-## Current status (Phase 1)
+## Current status (after Phase 2, DS-001)
 
-| Gate          | Status              | Note                                                                                |
-| ------------- | ------------------- | ----------------------------------------------------------------------------------- |
-| CI_BUILD_GATE | NEEDS_MANUAL_REVIEW | Passes locally (`npm run check`, e2e smoke); GitHub Actions not yet run (no remote) |
-| All others    | NOT_VERIFIED        | No product code yet                                                                 |
+| Gate                 | Status                                            | Note                                                                |
+| -------------------- | ------------------------------------------------- | ------------------------------------------------------------------- |
+| DESIGN_FIDELITY_GATE | PASS (tokens) / NEEDS_MANUAL_REVIEW (components)  | token test vs original bundle; side-by-side with windows in Phase 3 |
+| FUNCTIONAL_GATE      | PASS (design system)                              | unit + e2e                                                          |
+| ACCESSIBILITY_GATE   | PASS (automated, catalog) / NOT_VERIFIED (manual) | axe 0 serious/critical, 2 themes × 8 accents                        |
+| CI_BUILD_GATE        | PASS (local)                                      | Actions not yet run                                                 |
+| Others               | NOT_VERIFIED / NOT_APPLICABLE                     | see each spec's verification.md                                     |

@@ -15,6 +15,9 @@
 - T3 `@types/node@22` to satisfy vitest 5 peer deps and match Node 22 runtime.
 - T4 TypeScript 5.9 (scaffold default) rather than the newest major, for tooling compatibility.
 
+- T5 Prototype CSS is ported as plain CSS (tokens/base/components) with class names preserved, not re-expressed as Tailwind utilities, to keep fidelity verifiable line by line. Tailwind is used for new layout. Accessibility deviations are isolated in `a11y-overrides.css` (see docs/specs/DS-001/design-reference.md).
+- T6 `/design-system` catalog ships in the static export with `noindex`; revisit excluding it from production builds in Phase 8.
+
 ## Accepted risks
 
 - R1 `npm audit` reports 5 high advisories (braces → micromatch → fast-glob → @next/eslint-plugin-next → eslint-config-next) in **dev-only lint tooling**, not shipped. `npm run audit:prod` (production deps) is the release gate. The suggested fix downgrades eslint-config-next to 14: rejected. Revisit when upstream updates.
